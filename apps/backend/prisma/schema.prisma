@@ -1,0 +1,35 @@
+// Prisma schema — starting point, expect to evolve.
+// Not wired into the app yet (build order step 5); the API still serves
+// static data from src/players/data/players.data.ts.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Player {
+  id          Int      @id @default(autoincrement())
+  name        String
+  /// Canonical key (GK, CB, ST...) — translated on the frontend.
+  position    String
+  rating      Int
+  club        String
+  /// FC26, FC27... — decides which player pool a draft uses.
+  gameVersion String
+  pace        Int?
+  shooting    Int?
+  passing     Int?
+  dribbling   Int?
+  defending   Int?
+  physical    Int?
+  photoUrl    String?
+  createdAt   DateTime @default(now())
+
+  @@index([gameVersion, position])
+  @@index([gameVersion, club])
+}

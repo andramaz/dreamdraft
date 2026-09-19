@@ -1,0 +1,343 @@
+{
+  "app": {
+    "title": "DreamDraft",
+    "tagline": "Hayalindeki kadroyu kur. Draft yap. Rekabet et."
+  },
+  "language": {
+    "label": "Dil",
+    "en": "English",
+    "tr": "Türkçe"
+  },
+  "common": {
+    "back": "Geri",
+    "next": "İleri",
+    "cancel": "Vazgeç",
+    "loading": "Yükleniyor…",
+    "error": "Bir şeyler ters gitti. API çalışıyor mu?",
+    "retry": "Tekrar dene",
+    "close": "Kapat"
+  },
+  "players": {
+    "heading": "Oyuncu havuzu",
+    "count_one": "{{count}} oyuncu",
+    "count_other": "{{count}} oyuncu",
+    "loading": "Oyuncular yükleniyor…",
+    "error": "Oyuncular yüklenemedi. API çalışıyor mu?",
+    "retry": "Tekrar dene",
+    "empty": "Oyuncu bulunamadı.",
+    "rating": "Reyting"
+  },
+  "positions": {
+    "short": {
+      "GK": "KL",
+      "RB": "SĞB",
+      "CB": "STP",
+      "LB": "SLB",
+      "CDM": "DOS",
+      "CM": "MO",
+      "CAM": "OOS",
+      "RM": "SĞO",
+      "LM": "SLO",
+      "RW": "SĞK",
+      "LW": "SLK",
+      "ST": "SF"
+    },
+    "long": {
+      "GK": "Kaleci",
+      "RB": "Sağ Bek",
+      "CB": "Stoper",
+      "LB": "Sol Bek",
+      "CDM": "Defansif Orta Saha",
+      "CM": "Merkez Orta Saha",
+      "CAM": "Ofansif Orta Saha",
+      "RM": "Sağ Orta Saha",
+      "LM": "Sol Orta Saha",
+      "RW": "Sağ Kanat",
+      "LW": "Sol Kanat",
+      "ST": "Santrfor"
+    }
+  },
+  "stats": {
+    "short": {
+      "pace": "HIZ",
+      "shooting": "ŞUT",
+      "passing": "PAS",
+      "dribbling": "DRİ",
+      "defending": "DEF",
+      "physical": "FİZ"
+    },
+    "long": {
+      "pace": "Hız",
+      "shooting": "Şut",
+      "passing": "Pas",
+      "dribbling": "Dripling",
+      "defending": "Defans",
+      "physical": "Fizik"
+    }
+  },
+  "draft": {
+    "mode": {
+      "match": "Maç",
+      "tournament": "Turnuva"
+    },
+    "format": {
+      "league": "Lig",
+      "knockout": "Eleme",
+      "ucl": "Şampiyonlar Ligi"
+    },
+    "knockoutLegs": {
+      "single": "Tek maç",
+      "double": "Çift maç (iç saha & deplasman)"
+    },
+    "pickPattern": {
+      "straight": "Düz",
+      "snake": "Yılan"
+    },
+    "style": {
+      "randomTeams": "Rastgele Takımlar",
+      "yourChoice": "Senin Seçimin",
+      "randomPosition": "Rastgele Mevki",
+      "gambler": "Kumarbaz"
+    }
+  },
+  "wizard": {
+    "start": "Yeni draft",
+    "step": "Adım {{current}} / {{total}}",
+    "startDraft": "Draft'ı başlat",
+    "steps": {
+      "gameVersion": "Oyun",
+      "mode": "Mod",
+      "tournament": "Turnuva",
+      "participants": "Katılımcılar",
+      "order": "Sıra",
+      "style": "Draft stili",
+      "size": "Kadro",
+      "summary": "Özet",
+      "randomTeams": "Takım kuralları",
+      "yourChoice": "Takım sınırı"
+    },
+    "gameVersion": {
+      "question": "Hangi oyun sürümü?",
+      "hint": "Hangi oyuncu havuzunun kullanılacağını belirler.",
+      "empty": "Henüz oyuncu yok"
+    },
+    "mode": {
+      "question": "Maç mı, turnuva mı?",
+      "matchDesc": "Sadece draft, fikstür yok.",
+      "tournamentDesc": "Birden fazla takım, draft sonrası fikstür."
+    },
+    "tournament": {
+      "question": "Turnuva ayarları",
+      "teamCount": "Takım sayısı",
+      "format": "Format",
+      "leagueDesc": "Herkes herkesle oynar (lig usulü).",
+      "knockoutDesc": "Kaybeden elenir.",
+      "uclDesc": "Önce herkes birbiriyle oynar, sonra üst sıradakiler eleme turuna kalır. Elemeler çift ayaklı, final tek maç.",
+      "legs": "Eleme maçları",
+      "note": "Fikstür kurayla çekilir. Skorları sen girersin; tablo ve eşleşmeler kendiliğinden güncellenir.",
+      "legsSingleDesc": "Tur tek maçta biter.",
+      "legsDoubleDesc": "İç saha + deplasman; toplam skor belirler. Toplamda eşitlik olursa penaltılara gider.",
+      "uclTooFew": "Şampiyonlar Ligi için en az {{min}} takım gerekir — daha azında lig aşamasından kimse elenmez."
+    },
+    "participants": {
+      "question": "Kimler draft yapıyor?",
+      "hint": "İsimler çarkta ve kadrolarda görünür.",
+      "placeholder": "Katılımcı {{index}}",
+      "add": "Katılımcı ekle",
+      "remove": "Çıkar",
+      "locked": "Katılımcı sayısını turnuvadaki takım sayısı belirliyor.",
+      "duplicate": "İki katılımcı aynı ismi kullanamaz."
+    },
+    "order": {
+      "question": "Pick sırası nasıl belirlensin?",
+      "watch": "Çarkı çevir",
+      "watchDesc": "Sıra sıra rastgele çekiliş.",
+      "patternQuestion": "Pick düzeni",
+      "straightDesc": "Sıra her turda aynı: 1-2-3, 1-2-3…",
+      "snakeDesc": "Sıra her turda tersine döner: 1-2-3, 3-2-1…",
+      "manual": "Biz belirleyelim",
+      "manualDesc": "Çekiliş yok — kimin önce seçeceğini sen sıralarsın.",
+      "manualLabel": "Pick sırası",
+      "moveUp": "Yukarı taşı",
+      "moveDown": "Aşağı taşı"
+    },
+    "style": {
+      "question": "Oyuncular nasıl seçilsin?",
+      "randomTeamsDesc": "Her pick'te rastgele bir kulüp açılır, kadrosundan seçersin.",
+      "yourChoiceDesc": "Tüm havuzdan istediğini seçersin.",
+      "randomPositionDesc": "Her pick'te bir mevki ve reyting aralığı verilir.",
+      "gamblerDesc": "Rastgele bir diziliş çekilir, ilk 11 o dizilişe göre kurulur, yedekler tamamen rastgele gelir. Hiç seçim yapmazsın."
+    },
+    "size": {
+      "question": "Takım başına kaç oyuncu?",
+      "hint": "{{min}} ile {{max}} arasında.",
+      "poolWarning": "Bu ayar için havuzdaki oyuncu sayısı yetmiyor."
+    },
+    "summary": {
+      "question": "Hazır mısın?",
+      "mode": "Mod",
+      "participants": "Katılımcılar",
+      "style": "Draft stili",
+      "pattern": "Pick düzeni",
+      "size": "Takım başına oyuncu",
+      "draw": "Pick sırası",
+      "format": "Format"
+    },
+    "randomTeams": {
+      "question": "Rastgele Takımlar kuralları",
+      "hint": "Her pick için rastgele bir kulüp açılır.",
+      "rerolls": "Bir oyuncu kaç kez takım değiştirebilsin?",
+      "repeat": "Aynı takım tekrar gelebilsin mi?",
+      "repeatOff": "Hayır — bir kez",
+      "repeatOffDesc": "Sana çıkan kulüp bir daha sana çıkmaz.",
+      "repeatOn": "Evet — limitli",
+      "repeatOnDesc": "Aynı kulüp, o kulüpten alabileceğin oyuncu hakkın dolana kadar tekrar çıkabilir.",
+      "repeatOnSummary": "Evet, kulüp başına en fazla {{max}} oyuncu",
+      "maxPerTeam": "Bir kulüpten en fazla oyuncu",
+      "notEnoughClubs": "Kulüp sayısı yetmiyor: {{needed}} gerekli, havuzda {{available}} var.",
+      "rerollsHint": "Sıra sende rastgele bir kulüp açılır ve o kulübün kadrosundan seçersin. Kulübü beğenmezsen bu haklardan birini kullanıp yerine başka bir rastgele kulüp açarsın. Hakkın bitince çıkan kulüpten seçmek zorundasın. Bu hak draft boyunca geçerlidir ve herkese ayrı ayrı verilir.",
+      "rerollsShort": "Takım değiştirme hakkı"
+    },
+    "yourChoice": {
+      "question": "Aynı takımdan kaç oyuncu?",
+      "hint": "Oyuncuları serbest seçersin; tek sınır bir takımdan kaç kişi alabileceğin.",
+      "maxPerTeam": "Takım başına en fazla",
+      "noLimit": "Kadronun tamamı tek takımdan olabilir — sınır yok.",
+      "clubsNeeded": "Kadroyu kurmak için en az {{clubs}} farklı takım gerekir.",
+      "noLimitShort": "Sınırsız"
+    }
+  },
+  "draw": {
+    "title": "Sıra çekilişi",
+    "subtitle": "{{total}} sıradan {{current}}.",
+    "spin": "Çevir",
+    "spinning": "Dönüyor…",
+    "result": "Pick sırası",
+    "continue": "Draft'ı başlat"
+  },
+  "board": {
+    "round": "Tur {{current}} / {{total}}",
+    "pick": "Pick {{current}} / {{total}}",
+    "turn": "Sıra {{name}} adlı katılımcıda",
+    "clubBanner": "Takımın: {{club}}",
+    "positionBanner": "Mevki: {{position}} · Reyting {{min}}-{{max}}",
+    "positionBannerNoRating": "Mevki: {{position}}",
+    "squadBanner": "Sana verilen kadrodan seç ({{count}} oyuncu)",
+    "freeBanner": "Havuzdan istediğini seç",
+    "search": "Oyuncu veya kulüp ara",
+    "filterPosition": "Mevki",
+    "allPositions": "Hepsi",
+    "available_one": "{{count}} oyuncu uygun",
+    "available_other": "{{count}} oyuncu uygun",
+    "noMatch": "Bu filtreye uyan oyuncu yok.",
+    "showMore": "Daha fazla göster",
+    "autoPick": "Rastgele seç",
+    "undo": "Geri al",
+    "pickAction": "Seç",
+    "squads": "Kadrolar",
+    "picksCount": "{{current}} / {{total}}",
+    "finish": "Kadroları gör",
+    "draftBoard": "Draft tahtası",
+    "rollHint": "Kimlerden seçebileceğini görmek için rastgele takım aç.",
+    "rollTeam": "Rastgele takım getir",
+    "yourTeam": "Takımın",
+    "rollFirst": "Önce bir takım aç.",
+    "clubExhausted": "Bu kulüpten {{max}} oyuncu aldın — takımı değiştir, hakkından düşmez.",
+    "rerollPool": "Takım değiştirme hakkı",
+    "rerollsLeft": "{{total}} hakkın {{left}} tanesi kaldı",
+    "anotherTeam": "Takımı değiştir",
+    "freeReroll": "ücretsiz",
+    "rolling": "Çekiliyor…",
+    "clubLimitFull": "{{club}} takımından oyuncu limitini doldurdun ({{max}}) — başka takımdan seç.",
+    "clubLimitBanner": "Aynı takımdan en fazla {{max}} oyuncu alabilirsin.",
+    "rollPosition": "MEVKİ",
+    "rollRating": "REYTİNG",
+    "drawing": "Çekiliyor…",
+    "anyRating": "Fark etmez",
+    "drawConstraint": "Çekilişi yap",
+    "drawPrompt": "Sıra sende — çekilişi yap."
+  },
+  "results": {
+    "title": "Kadrolar",
+    "avg": "Ortalama reyting",
+    "newDraft": "Yeni draft",
+    "tournamentNote": "Kadrolar hazır. Fikstür kurayla çekilecek.",
+    "startTournament": "Fikstürü çek",
+    "backToTournament": "Turnuvaya dön",
+    "empty": "Oyuncu yok.",
+    "startingEleven": "İlk 11",
+    "bench": "Yedekler"
+  },
+  "tournament": {
+    "leaguePhase": "Lig aşaması",
+    "knockoutPhase": "Eleme aşaması",
+    "fixtures": "Fikstür",
+    "standings": "Puan durumu",
+    "finalTable": "Lig aşaması puan durumu",
+    "squads": "Kadrolar",
+    "week": "{{number}}. hafta",
+    "score": "Skor",
+    "leg": "{{number}}. maç",
+    "aggregate": "Toplam: {{home}}-{{away}}",
+    "penaltyQuestion": "Toplamda eşitlik — penaltıları kim kazandı?",
+    "homeGoals": "{{team}} golü",
+    "awayGoals": "{{team}} golü",
+    "position": "#",
+    "team": "Takım",
+    "tbd": "?",
+    "bye": "Bay geçti",
+    "bracketHint": "Skorları gir; kazananlar bir sonraki tura kendiliğinden geçer.",
+    "qualifyNote": "İlk {{top}} takım eleme turuna çıkar. {{remaining}} maç kaldı.",
+    "leagueDone": "Lig aşaması bitti — eleme kuraları tabloya göre yapıldı.",
+    "short": {
+      "played": "O",
+      "won": "G",
+      "drawn": "B",
+      "lost": "M",
+      "goalsFor": "A",
+      "goalsAgainst": "Y",
+      "goalDiff": "AV",
+      "points": "P"
+    },
+    "full": {
+      "played": "Oynadığı",
+      "won": "Galibiyet",
+      "drawn": "Beraberlik",
+      "lost": "Mağlubiyet",
+      "goalsFor": "Attığı gol",
+      "goalsAgainst": "Yediği gol",
+      "goalDiff": "Averaj",
+      "points": "Puan"
+    },
+    "rounds": {
+      "final": "Final",
+      "semi": "Yarı final",
+      "quarter": "Çeyrek final",
+      "roundOf": "Son {{teams}}"
+    }
+  },
+  "champion": {
+    "title": "Şampiyon",
+    "squads": "Kadroları gör",
+    "again": "Yeni draft"
+  },
+  "pitch": {
+    "open": "{{name}} kadrosunu sahada gör",
+    "openHint": "Kadroyu sahada gör",
+    "openShort": "Sahada gör",
+    "slot": "{{position}} mevkisi",
+    "formation": "Diziliş",
+    "tactic": "Stil",
+    "tactics": {
+      "defensive": "Defansif",
+      "balanced": "Dengeli",
+      "attacking": "Hücum"
+    },
+    "squad": "Kadro — {{placed}}/{{total}} sahada",
+    "empty": "Henüz oyuncu yok.",
+    "onPitch": "Sahada",
+    "onBench": "Yedek",
+    "pickPlayer": "Şimdi listeden bir oyuncu seç.",
+    "clearSlot": "Boşalt"
+  }
+}

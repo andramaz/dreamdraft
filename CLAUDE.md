@@ -1,0 +1,280 @@
+# FIFA/FC Draft Site — Project Context
+
+## What this is
+
+A FIFA/FC-style player draft website, inspired by Futwiz. Built primarily as a
+**practice project**: learning how data-scraping/API-fetching pipelines work,
+and getting hands-on with a full-stack setup (NestJS + Prisma + PostgreSQL + React).
+Not intended to be a large-scale commercial product — small, personal/portfolio
+scale, deployed to a server for fun and to practice deployment.
+
+## Stack
+
+- **Backend:** NestJS (TypeScript)
+- **ORM:** Prisma
+- **Database:** PostgreSQL (self-hosted instance already used for another project —
+  this app gets its own database on the same instance)
+- **Frontend:** React (via Vite)
+- **i18n:** `react-i18next` — site must support **both Turkish and English**,
+  user-switchable. Set this up from the start of scaffolding, not retrofitted
+  later. Translation keys in `en.json` / `tr.json`; avoid hardcoded UI strings.
+  Backend responses should stay language-agnostic (IDs/keys), translation
+  happens frontend-side. Domain data like position abbreviations (ST, CB, etc.)
+  needs its own translated label mapping.
+- **Deployment target:** TBD — likely Railway/Render (backend + DB) and
+  Vercel/Netlify (frontend). Not decided yet, revisit when we get there.
+
+## Visual direction
+
+- UI should evoke **dynamic, glossy/shiny Champions League–style FIFA/FC
+  interfaces** — think UCL draw show visuals, animated glow/shine effects,
+  dramatic team/player reveals. This is a core aesthetic goal, not just
+  functional UI. Worth investing in animation/transition polish (card reveals,
+  draft picks, fixture draws) once core functionality works.
+
+## Background / context on data sourcing
+
+- Player stats and "head render" photos will be sourced similarly to how
+  Futwiz/Sofifa/Fifaindex-style sites do it — via scraping or reverse-engineered
+  API endpoints (found via browser DevTools Network tab).
+- This is a legal gray area (EA's data/assets, not licensed) but low-risk given
+  the small, non-commercial scale. Rate-limit requests, respect robots.txt where
+  possible, and cache scraped data instead of live-fetching on every request.
+- Candidate data sources discussed: Sofifa.com, Kaggle FIFA datasets (for early
+  testing without live scraping), Futwiz/Fifaindex-style API endpoints.
+- Photos should be cached (own storage/S3-like) rather than hotlinked long-term.
+
+## Build order (agreed approach — follow this sequence)
+
+1. **Scaffold with fake/static data first.** Don't start with scraping — build
+   the app shell against a small hand-written JSON set of ~10-20 players
+   (name, position, rating, stats, placeholder photoUrl).
+2. Backend: NestJS + Prisma set up, `Player` model defined, basic
+   `GET /api/players` endpoint (initially can return the fake data before DB
+   is wired in).
+3. Frontend: React app consuming that endpoint, showing player cards. Set up
+   i18n scaffolding at this stage too.
+4. Add draft logic (draft config flow below, random selection, team building).
+5. Wire Prisma/PostgreSQL in for real — replace fake JSON with DB reads/writes.
+6. Deploy early (even with fake data) to de-risk deployment separately from
+   scraping work.
+7. **Scraping/data-fetching comes last** — build the scraper once the target
+   schema/fields are already known from steps 1-4. Run as a seed/cron job that
+   populates the DB periodically, not on-demand per request.
+8. Visual polish (glossy/animated UCL-style UI) — layer in once core flows work.
+
+## Draft/tournament flow — user-facing steps
+
+The user goes through a config wizard before a draft starts:
+
+1. **Game version** — FC26 / FC27 / etc. Determines which player pool/stats to use.
+2. **Mode** — `match` (no extra config) or `tournament`.
+   - `match` means **draft only, no fixtures** — the site builds the squads and
+     stops, the games are arranged off-site. It is not limited to two people:
+     2-8 may draft (`MATCH_PARTICIPANTS_MAX`). Switching back from a larger
+     tournament roster trims it to the cap.
+   - If tournament: enter **team count** (2-16) and **format**:
+     - `league` (round robin)
+     - `knockout` (single-leg or double-leg/home-away — the choice applies to
+       every round, the final included)
+     - `ucl` (hybrid: league phase → knockout phase, like the current
+       Champions League format) — **settled 2026-09-18**: everyone plays one
+       round robin, then the top finishers go into a bracket. How many go
+       through is the largest power of two _below_ the team count (6 → 4,
+       8 → 4, 9 → 8), so the bracket is always full and the league phase
+       always sends someone home. That last part needs at least **3 teams**
+       (`UCL_TEAMS_MIN`) — with two, both would qualify, so the wizard blocks
+       it. Legs are **not asked** for this format (settled 2026-09-19): the
+       knockout rounds are two-legged and the final is a single game, like the
+       real competition. Two legs are also what makes the table seeding worth
+       playing for — finishing higher means the return leg is at home. See
+       `roundLegs`.
+   - Fixtures are **always drawn randomly** (decided 2026-09-18). Seeding by
+     draft order was dropped: the draft order is itself a random draw, so
+     seeding by it would apply the same luck twice. Byes in a knockout are
+     drawn too.
+   - The one exception is the `ucl` bracket: it is **seeded by the league
+     table** (1 v N, 2 v N-1, …), because finishing higher is the whole point
+     of playing the league phase. Editing a league score reseeds it, but only
+     until the first knockout result is entered.
+   - **Results are entered by hand.** The user types the score of every game;
+     the table, the bracket and the champion follow from that. A level
+     knockout tie asks who won on penalties.
+3. **Draft order** — the user chooses _how_ the pick order is decided
+   (revised 2026-09-18, replaces the 2026-09-17 "always random" decision):
+   - **Spin the wheel** (`draftOrder.randomize: true`) — the order is drawn
+     randomly, slot by slot, on the fortune wheel. The draw always plays out;
+     there is no "skip the draw" button.
+   - **We decide** (`draftOrder.randomize: false`) — no draw at all. The user
+     orders the participants by hand in the wizard (up/down buttons) and that
+     order is handed to the draft flow as an explicit list of participant ids.
+   - **Pick pattern** is always asked, in both cases:
+     - `straight` — order repeats every round (1-2-3, 1-2-3, 1-2-3...)
+     - `snake` — order reverses each round (1-2-3, 3-2-1, 1-2-3, 3-2-1...)
+4. **Draft style** — how players are selected:
+   - **a) Random teams** — a random club is rolled **for every single pick**;
+     the user picks one player from whatever club shows up (decided
+     2026-09-17, see the draft-board reference UI).
+     - **"Another team" rights**: user picks 3-6 at setup, per participant.
+       Spending one rolls a different club.
+     - **Repeat teams off**: a club that came up for you never comes up for
+       you again (so a squad needs `playersPerTeam` distinct clubs).
+     - **Repeat teams on**: the same club may come up again until the user's
+       **max players per club** limit is reached. If a club is rolled after
+       that limit is full, a warning shows and the picker must roll again —
+       **that swap is always free** (decided 2026-09-18): a right is only spent
+       when the picker _chooses_ to drop a club they could still have used.
+     - No random _player_ auto-pick in this style.
+   - **b) Your choice** — user picks both the team and individual players
+     freely, up to `playersPerTeam`.
+     - **Max players per club** (added 2026-09-19): asked at setup, default 4.
+       Setting it to `playersPerTeam` lifts the limit. Players from a club the
+       picker has filled stay **on the board, dimmed and unpickable** — the
+       point is to show why, not to make them vanish; clicking one says the
+       limit for that club is full and to pick from another.
+     - No random _player_ auto-pick in this style either — it is called Your
+       Choice, so the dice button is not offered.
+
+   There is **no "random pick" button anywhere** on the board any more
+   (2026-09-19). Every style that reaches the board either rolls something of
+   its own or is explicitly about choosing, and the two styles that pick for
+   you (Gambler, Preset) never open the board at all.
+   - **c) Random Position** — algo gives a random position + rating range
+     constraint, user picks within that constraint, up to `playersPerTeam`.
+     - Every pick runs **two draws on screen** (2026-09-19), and the picker
+       **presses a button** to start them — nothing happens on its own. The
+       position lands first, then the rating band. The answer is already
+       computed — the spin is presentation — so the board is held back behind
+       a prompt until both settle, and the available count is hidden with it.
+       Otherwise the cards would give the draw away.
+     - The constraint is **not** capped to a number of candidates: whatever is
+       left in the pool at that position and rating band is shown, paged 24 at
+       a time.
+   - **d) Gambler** (TR "Kumarbaz") — **no picking at all** (settled
+     2026-09-19). A formation is drawn per participant and the eleven is filled
+     slot by slot; anything past eleven is a random substitute. Renamed from
+     "Soldier of Fortune" the same day; the config key is `gambler`.
+     - Shapes live in `FORMATIONS` (4-3-3, 4-4-2, 4-2-3-1, 3-5-2). "One of
+       every position" is deliberately **not** the rule: there are 12 position
+       keys and only eleven slots, and a shape needs two centre-backs more than
+       it needs a left-midfielder.
+     - Squads are dealt from one shrinking pool, so they never overlap. If a
+       position has run out the slot falls back to the nearest role (`NEARBY`)
+       rather than leaving a hole.
+     - The dealt order is kept all the way to the results screen, which shows
+       "starting eleven + formation" above "bench" instead of sorting the squad
+       by rating the way the other styles do.
+       **"Preset teams" was removed on 2026-09-19.** This is a draft site: a style
+       that skips the draft has nothing to offer here, and anyone who wants ready
+       squads can set the fixtures up in the game itself. It had also collapsed
+       into a worse Gambler once Gambler started dealing whole squads — same
+       behaviour, without the formation.
+
+### Pitch view (added 2026-09-19)
+
+Clicking a participant — their card in the draft sidebar, or the button on the
+squads screen — opens the squad on a pitch. It is an **overlay**, not a split
+screen: the card grid would drop to two columns and the pitch would be too
+small to read if they shared the width, and the pitch is consulted between
+picks rather than while scanning cards. It closes on an outside click or Esc.
+
+- Shapes live in `FORMATIONS` with pitch coordinates (`x` 0-100 left to right,
+  `y` 0 at the goal being attacked, 100 at your own). Eight of them, all
+  eleven slots with exactly one keeper.
+- The **style** buttons (defensive / balanced / attacking) shift the outfield
+  lines up or down the pitch and nothing else — there is no tactics engine
+  behind them, and the keeper never moves.
+- `fillShape` places the squad: each slot takes the best-rated player of its
+  own position, then the nearest role (`NEARBY`), and is left **dashed and
+  empty** if nothing fits. That is the point during a draft — the gaps show
+  what you still need. Leftovers become the bench.
+- Clicking a slot arms it; clicking a player then pins them there, even out of
+  position (shown in magenta). Pinned slots survive a change of shape or style.
+- The layout is **view only** — it never constrains the draft. A formation
+  requirement stacked on top of Random Position or Random Teams would often be
+  impossible to satisfy.
+- The choices live in `useDraftFlow`, not in a screen, so a shape arranged
+  mid-draft is still there on the squads screen.
+
+5. **Players per team** — user-defined, **min 11, max 18**. Applies across all
+   draft styles (single shared config value, asked once, not per-style).
+
+## Draft config schema (working draft, expect to evolve)
+
+```ts
+interface DraftConfig {
+  gameVersion: 'FC26' | 'FC27';
+  mode: 'match' | 'tournament';
+  tournament?: {
+    teamCount: number;
+    format: 'league' | 'knockout' | 'ucl'; // ucl = MVP+ later, rules TBD
+    knockoutLegs?: 'single' | 'double';
+  };
+  draftOrder: {
+    randomize: boolean; // true = spin the wheel, false = the user orders by hand
+    pickPattern?: 'straight' | 'snake'; // always asked
+  };
+  draftStyle: 'randomTeams' | 'yourChoice' | 'randomPosition' | 'gambler';
+  randomTeams?: {
+    rerolls: number; // 3-6, per participant
+    allowRepeatTeams: boolean;
+    maxPlayersPerTeam: number; // only when allowRepeatTeams
+  };
+  yourChoice?: {
+    maxPlayersPerTeam: number; // 1..playersPerTeam; equal to it means no limit
+  };
+  playersPerTeam: number; // min 11, max 18
+}
+```
+
+## Initial Prisma schema (starting point, expect to evolve)
+
+```prisma
+model Player {
+  id          Int      @id @default(autoincrement())
+  name        String
+  position    String   // canonical key: GK, CB, ST... (see packages/shared)
+  rating      Int
+  club        String   // needed for "random teams" draft style
+  gameVersion String   // FC26, FC27... — selects the player pool
+  pace        Int?
+  shooting    Int?
+  passing     Int?
+  dribbling   Int?
+  defending   Int?
+  physical    Int?
+  photoUrl    String?
+  createdAt   DateTime @default(now())
+}
+```
+
+Actual schema lives in `apps/backend/prisma/schema.prisma`.
+Likely future models: `Draft`, `DraftPlayer` (join table linking a draft session
+to selected players), `Tournament`, `Match`/`Fixture` — not yet defined, add
+when draft/tournament logic is implemented.
+
+## Developer background (for tone/explanation calibration)
+
+- Strong Java background — comparisons to Java/Spring/Hibernate concepts are
+  useful reference points when explaining NestJS/Prisma patterns.
+- Comfortable with HTML/CSS/JS/Node/PHP fundamentals; still learning
+  NestJS/Prisma specifics (has used NestJS before but not deeply familiar).
+- Already runs a PostgreSQL instance for another project — reuse it, just add
+  a new database for this project.
+
+## Notes / open questions
+
+- Deployment provider not finalized.
+- Exact scraping source (Sofifa vs Futwiz-style endpoints vs Kaggle dataset)
+  not finalized — decide once schema is stable.
+- UCL format: **settled** — round robin, then a bracket for the top finishers
+  (see step 2).
+- Fixture order: **settled** — always a random draw, no seeding (see step 2).
+  The engine lives in `packages/shared/src/tournament.ts` and is wired to the
+  UI: `TournamentScreen` (table + week-by-week fixtures, or the bracket),
+  `Bracket`, `StandingsTable`, and `ChampionScreen` for the trophy.
+- Draft order: **settled** — wheel draw or manual ordering, the user picks
+  which (see step 3).
+- Fake pool is generated (20 clubs x 20 players) in
+  `apps/backend/src/players/data/players.data.ts`; clubs need >= 18 players so
+  Random Teams works at the max squad size.

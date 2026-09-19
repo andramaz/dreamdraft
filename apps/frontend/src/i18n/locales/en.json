@@ -1,0 +1,343 @@
+{
+  "app": {
+    "title": "DreamDraft",
+    "tagline": "Build your dream squad. Draft. Compete."
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "tr": "Türkçe"
+  },
+  "common": {
+    "back": "Back",
+    "next": "Next",
+    "cancel": "Cancel",
+    "loading": "Loading…",
+    "error": "Something went wrong. Is the API running?",
+    "retry": "Try again",
+    "close": "Close"
+  },
+  "players": {
+    "heading": "Player pool",
+    "count_one": "{{count}} player",
+    "count_other": "{{count}} players",
+    "loading": "Loading players…",
+    "error": "Couldn't load players. Is the API running?",
+    "retry": "Try again",
+    "empty": "No players found.",
+    "rating": "Rating"
+  },
+  "positions": {
+    "short": {
+      "GK": "GK",
+      "RB": "RB",
+      "CB": "CB",
+      "LB": "LB",
+      "CDM": "CDM",
+      "CM": "CM",
+      "CAM": "CAM",
+      "RM": "RM",
+      "LM": "LM",
+      "RW": "RW",
+      "LW": "LW",
+      "ST": "ST"
+    },
+    "long": {
+      "GK": "Goalkeeper",
+      "RB": "Right Back",
+      "CB": "Centre Back",
+      "LB": "Left Back",
+      "CDM": "Defensive Midfielder",
+      "CM": "Central Midfielder",
+      "CAM": "Attacking Midfielder",
+      "RM": "Right Midfielder",
+      "LM": "Left Midfielder",
+      "RW": "Right Winger",
+      "LW": "Left Winger",
+      "ST": "Striker"
+    }
+  },
+  "stats": {
+    "short": {
+      "pace": "PAC",
+      "shooting": "SHO",
+      "passing": "PAS",
+      "dribbling": "DRI",
+      "defending": "DEF",
+      "physical": "PHY"
+    },
+    "long": {
+      "pace": "Pace",
+      "shooting": "Shooting",
+      "passing": "Passing",
+      "dribbling": "Dribbling",
+      "defending": "Defending",
+      "physical": "Physical"
+    }
+  },
+  "draft": {
+    "mode": {
+      "match": "Match",
+      "tournament": "Tournament"
+    },
+    "format": {
+      "league": "League",
+      "knockout": "Knockout",
+      "ucl": "Champions League"
+    },
+    "knockoutLegs": {
+      "single": "Single leg",
+      "double": "Two legs (home & away)"
+    },
+    "pickPattern": {
+      "straight": "Straight",
+      "snake": "Snake"
+    },
+    "style": {
+      "randomTeams": "Random Teams",
+      "yourChoice": "Your Choice",
+      "randomPosition": "Random Position",
+      "gambler": "Gambler"
+    }
+  },
+  "wizard": {
+    "start": "New draft",
+    "step": "Step {{current}} / {{total}}",
+    "startDraft": "Start the draft",
+    "steps": {
+      "gameVersion": "Game",
+      "mode": "Mode",
+      "tournament": "Tournament",
+      "participants": "Participants",
+      "order": "Pick order",
+      "style": "Draft style",
+      "size": "Squad size",
+      "summary": "Summary",
+      "randomTeams": "Team rules",
+      "yourChoice": "Club limit"
+    },
+    "gameVersion": {
+      "question": "Which game version?",
+      "hint": "Decides which player pool the draft uses.",
+      "empty": "No players yet"
+    },
+    "mode": {
+      "question": "Match or tournament?",
+      "matchDesc": "Draft only, no fixtures.",
+      "tournamentDesc": "Several teams, fixtures after the draft."
+    },
+    "tournament": {
+      "question": "Tournament setup",
+      "teamCount": "Number of teams",
+      "format": "Format",
+      "leagueDesc": "Everyone plays everyone (round robin).",
+      "knockoutDesc": "Lose and you're out.",
+      "uclDesc": "Everyone plays everyone, then the top finishers go into a bracket. The knockout rounds are two-legged, the final is a single game.",
+      "legs": "Knockout legs",
+      "note": "The fixtures are drawn at random. You enter the scores; the table and the bracket keep themselves up to date.",
+      "legsSingleDesc": "One match decides the tie.",
+      "legsDoubleDesc": "Home and away; the aggregate score decides. Level on aggregate goes to penalties.",
+      "uclTooFew": "The Champions League needs at least {{min}} teams — below that the league phase sends nobody home."
+    },
+    "participants": {
+      "question": "Who is drafting?",
+      "hint": "Names are used on the wheel and on the squads.",
+      "placeholder": "Participant {{index}}",
+      "add": "Add participant",
+      "remove": "Remove",
+      "locked": "The tournament team count sets how many participants there are.",
+      "duplicate": "Two participants cannot have the same name."
+    },
+    "order": {
+      "question": "How is the pick order decided?",
+      "watch": "Spin the wheel",
+      "watchDesc": "A random draw, one slot at a time.",
+      "patternQuestion": "Pick pattern",
+      "straightDesc": "The order repeats every round: 1-2-3, 1-2-3…",
+      "snakeDesc": "The order reverses every round: 1-2-3, 3-2-1…",
+      "manual": "Set it ourselves",
+      "manualDesc": "No draw — you arrange who picks first.",
+      "manualLabel": "Pick order",
+      "moveUp": "Move up",
+      "moveDown": "Move down"
+    },
+    "style": {
+      "question": "How are players picked?",
+      "randomTeamsDesc": "Every pick rolls a random club; you pick from its squad.",
+      "yourChoiceDesc": "Pick anyone from the whole pool.",
+      "randomPositionDesc": "Each pick gives you a position and a rating range.",
+      "gamblerDesc": "A formation is drawn, the eleven is filled slot by slot and the substitutes come at random. You pick nothing."
+    },
+    "size": {
+      "question": "How many players per team?",
+      "hint": "Between {{min}} and {{max}}.",
+      "poolWarning": "Not enough players in the pool for this setup."
+    },
+    "summary": {
+      "question": "Ready?",
+      "mode": "Mode",
+      "participants": "Participants",
+      "style": "Draft style",
+      "pattern": "Pick pattern",
+      "size": "Players per team",
+      "draw": "Pick order",
+      "format": "Format"
+    },
+    "randomTeams": {
+      "question": "Random Teams rules",
+      "hint": "A random club is rolled for every single pick.",
+      "rerolls": "How many times can a player change the team?",
+      "repeat": "Can the same team come up again?",
+      "repeatOff": "No — once each",
+      "repeatOffDesc": "A club that came up for you never comes up for you again.",
+      "repeatOn": "Yes — with a limit",
+      "repeatOnDesc": "The same club can come up again until you hit your player limit for it.",
+      "repeatOnSummary": "Yes, max {{max}} players per club",
+      "maxPerTeam": "Max players from one club",
+      "notEnoughClubs": "Not enough clubs: {{needed}} needed, {{available}} in the pool.",
+      "rerollsHint": "On your turn a random club is rolled and you pick from its squad. Don't like the club? Use one of these to change it for another random one. When they run out you have to pick from whatever club comes up. Everyone gets this many for the whole draft.",
+      "rerollsShort": "Team changes"
+    },
+    "yourChoice": {
+      "question": "How many from one club?",
+      "hint": "You pick the players freely; the only limit is how many may come from a single club.",
+      "maxPerTeam": "Max per club",
+      "noLimit": "A whole squad may come from one club — no limit.",
+      "clubsNeeded": "Building a squad needs at least {{clubs}} different clubs.",
+      "noLimitShort": "No limit"
+    }
+  },
+  "draw": {
+    "title": "Pick order draw",
+    "subtitle": "Slot {{current}} of {{total}}",
+    "spin": "Spin",
+    "spinning": "Spinning…",
+    "result": "Pick order",
+    "continue": "Start the draft"
+  },
+  "board": {
+    "round": "Round {{current}} / {{total}}",
+    "pick": "Pick {{current}} / {{total}}",
+    "turn": "{{name}} is picking",
+    "clubBanner": "Your club: {{club}}",
+    "positionBanner": "Position: {{position}} · Rating {{min}}-{{max}}",
+    "positionBannerNoRating": "Position: {{position}}",
+    "squadBanner": "Pick from your random squad ({{count}} players)",
+    "freeBanner": "Pick anyone from the pool",
+    "search": "Search player or club",
+    "filterPosition": "Position",
+    "allPositions": "All",
+    "available_one": "{{count}} player available",
+    "available_other": "{{count}} players available",
+    "noMatch": "No player matches this filter.",
+    "showMore": "Show more",
+    "autoPick": "Random pick",
+    "undo": "Undo",
+    "pickAction": "Pick",
+    "squads": "Squads",
+    "picksCount": "{{current}} / {{total}}",
+    "finish": "See the squads",
+    "draftBoard": "Draft board",
+    "rollHint": "Roll a random team to see who you can pick from.",
+    "rollTeam": "Get random team",
+    "yourTeam": "Your team",
+    "rollFirst": "Roll a team first.",
+    "clubExhausted": "You already took {{max}} players from this club — change the team, it won't cost a right.",
+    "rerollPool": "Team changes left",
+    "rerollsLeft": "{{left}} of {{total}}",
+    "anotherTeam": "Change team",
+    "freeReroll": "free",
+    "rolling": "Rolling…",
+    "clubLimitFull": "You have filled the player limit for {{club}} ({{max}}) — pick from another club.",
+    "clubLimitBanner": "At most {{max}} players from the same club.",
+    "rollPosition": "POSITION",
+    "rollRating": "RATING",
+    "drawing": "Drawing…",
+    "anyRating": "Any",
+    "drawConstraint": "Draw",
+    "drawPrompt": "Your turn — make the draw."
+  },
+  "results": {
+    "title": "Squads",
+    "avg": "Average rating",
+    "newDraft": "New draft",
+    "tournamentNote": "Squads are set. The fixtures will be drawn at random.",
+    "startTournament": "Draw the fixtures",
+    "backToTournament": "Back to the tournament",
+    "empty": "No players.",
+    "startingEleven": "Starting eleven",
+    "bench": "Bench"
+  },
+  "tournament": {
+    "leaguePhase": "League phase",
+    "knockoutPhase": "Knockout phase",
+    "fixtures": "Fixtures",
+    "standings": "Table",
+    "finalTable": "League phase table",
+    "squads": "Squads",
+    "week": "Week {{number}}",
+    "score": "Score",
+    "leg": "Leg {{number}}",
+    "aggregate": "Aggregate: {{home}}-{{away}}",
+    "penaltyQuestion": "Level on aggregate — who won on penalties?",
+    "homeGoals": "{{team}} goals",
+    "awayGoals": "{{team}} goals",
+    "position": "#",
+    "team": "Team",
+    "tbd": "?",
+    "bye": "Bye",
+    "bracketHint": "Enter the scores; winners move up the bracket on their own.",
+    "qualifyNote": "The top {{top}} go through to the knockout phase. {{remaining}} games left.",
+    "leagueDone": "League phase over — the bracket is seeded by the table.",
+    "short": {
+      "played": "P",
+      "won": "W",
+      "drawn": "D",
+      "lost": "L",
+      "goalsFor": "GF",
+      "goalsAgainst": "GA",
+      "goalDiff": "GD",
+      "points": "Pts"
+    },
+    "full": {
+      "played": "Played",
+      "won": "Won",
+      "drawn": "Drawn",
+      "lost": "Lost",
+      "goalsFor": "Goals for",
+      "goalsAgainst": "Goals against",
+      "goalDiff": "Goal difference",
+      "points": "Points"
+    },
+    "rounds": {
+      "final": "Final",
+      "semi": "Semi-finals",
+      "quarter": "Quarter-finals",
+      "roundOf": "Round of {{teams}}"
+    }
+  },
+  "champion": {
+    "title": "Champion",
+    "squads": "See the squads",
+    "again": "New draft"
+  },
+  "pitch": {
+    "open": "See {{name}} on the pitch",
+    "openHint": "See the squad on the pitch",
+    "openShort": "On the pitch",
+    "slot": "{{position}} slot",
+    "formation": "Formation",
+    "tactic": "Style",
+    "tactics": {
+      "defensive": "Defensive",
+      "balanced": "Balanced",
+      "attacking": "Attacking"
+    },
+    "squad": "Squad — {{placed}}/{{total}} on the pitch",
+    "empty": "No players yet.",
+    "onPitch": "On pitch",
+    "onBench": "Bench",
+    "pickPlayer": "Now pick a player from the list.",
+    "clearSlot": "Clear"
+  }
+}

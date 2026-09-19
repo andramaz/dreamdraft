@@ -1,0 +1,25 @@
+{
+  "name": "dreamdraft",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "postinstall": "npm run build -w @dreamdraft/shared",
+    "dev": "concurrently -n shared,api,web -c magenta,blue,green \"npm run dev -w @dreamdraft/shared\" \"npm run start:dev -w @dreamdraft/backend\" \"npm run dev -w @dreamdraft/frontend\"",
+    "build": "npm run build -w @dreamdraft/shared && npm run build -w @dreamdraft/backend && npm run build -w @dreamdraft/frontend",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "prettier": "^3.9.7",
+    "typescript": "~6.0.2"
+  }
+}
