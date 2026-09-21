@@ -74,7 +74,12 @@ The user goes through a config wizard before a draft starts:
      2-8 may draft (`MATCH_PARTICIPANTS_MAX`). Switching back from a larger
      tournament roster trims it to the cap.
    - If tournament: enter **team count** (2-16) and **format**:
-     - `league` (round robin)
+     - `league` (round robin) — asked whether each pair meets **once or home
+       and away** (added 2026-09-21). `double` replays the whole calendar with
+       the fixtures reversed, so the second half of the season is the first
+       half at the other ground and every team hosts every other one. This is
+       asked **only for `league`**: a `ucl` league phase stays single, like
+       the real competition.
      - `knockout` (single-leg or double-leg/home-away — the choice applies to
        every round, the final included)
      - `ucl` (hybrid: league phase → knockout phase, like the current
@@ -100,18 +105,7 @@ The user goes through a config wizard before a draft starts:
    - **Results are entered by hand.** The user types the score of every game;
      the table, the bracket and the champion follow from that. A level
      knockout tie asks who won on penalties.
-3. **Draft order** — the user chooses _how_ the pick order is decided
-   (revised 2026-09-18, replaces the 2026-09-17 "always random" decision):
-   - **Spin the wheel** (`draftOrder.randomize: true`) — the order is drawn
-     randomly, slot by slot, on the fortune wheel. The draw always plays out;
-     there is no "skip the draw" button.
-   - **We decide** (`draftOrder.randomize: false`) — no draw at all. The user
-     orders the participants by hand in the wizard (up/down buttons) and that
-     order is handed to the draft flow as an explicit list of participant ids.
-   - **Pick pattern** is always asked, in both cases:
-     - `straight` — order repeats every round (1-2-3, 1-2-3, 1-2-3...)
-     - `snake` — order reverses each round (1-2-3, 3-2-1, 1-2-3, 3-2-1...)
-4. **Draft style** — how players are selected:
+3. **Draft style** — how players are selected:
    - **a) Random teams** — a random club is rolled **for every single pick**;
      the user picks one player from whatever club shows up (decided
      2026-09-17, see the draft-board reference UI).
@@ -181,9 +175,17 @@ picks rather than while scanning cards. It closes on an outside click or Esc.
 - Shapes live in `FORMATIONS` with pitch coordinates (`x` 0-100 left to right,
   `y` 0 at the goal being attacked, 100 at your own). Eight of them, all
   eleven slots with exactly one keeper.
-- The **style** buttons (defensive / balanced / attacking) shift the outfield
-  lines up or down the pitch and nothing else — there is no tactics engine
-  behind them, and the keeper never moves.
+- The **style** buttons (defensive / balanced / attacking) pick a different
+  version of the shape, not a vertical nudge (reworked 2026-09-21 against the
+  reference screenshots). The central midfield walks the DM -> CM -> AM ladder,
+  full-backs become wing-backs going forward and drop into the defensive line
+  going back, and some shapes change character outright: 4-4-2 attacking is a
+  midfield diamond, 4-5-1 attacking drops both wide midfielders for a second
+  number ten, 3-5-2 attacking turns its wing-backs into wingers. All 24
+  (shape x style) layouts are written out in `SHAPES`; `FORMATIONS` exposes the
+  balanced one, which is what a Gambler squad is dealt against so changing the
+  style on screen never rewrites who was handed out. There is still no tactics
+  engine behind any of it, and the keeper never moves.
 - `fillShape` places the squad: each slot takes the best-rated player of its
   own position, then the nearest role (`NEARBY`), and is left **dashed and
   empty** if nothing fits. That is the point during a draft — the gaps show
@@ -196,6 +198,23 @@ picks rather than while scanning cards. It closes on an outside click or Esc.
 - The choices live in `useDraftFlow`, not in a screen, so a shape arranged
   mid-draft is still there on the squads screen.
 
+  Asked **before** the pick order (moved 2026-09-21), because the style
+  decides whether an order is worth asking for at all: **Gambler skips the
+  order step entirely** — it deals the squads itself, nobody picks, and the
+  deal reads the participant list rather than the pick order, so a wheel
+  draw there would be a draw with nothing riding on it.
+
+4. **Draft order** — the user chooses _how_ the pick order is decided
+   (revised 2026-09-18, replaces the 2026-09-17 "always random" decision):
+   - **Spin the wheel** (`draftOrder.randomize: true`) — the order is drawn
+     randomly, slot by slot, on the fortune wheel. The draw always plays out;
+     there is no "skip the draw" button.
+   - **We decide** (`draftOrder.randomize: false`) — no draw at all. The user
+     orders the participants by hand in the wizard (up/down buttons) and that
+     order is handed to the draft flow as an explicit list of participant ids.
+   - **Pick pattern** is always asked, in both cases:
+     - `straight` — order repeats every round (1-2-3, 1-2-3, 1-2-3...)
+     - `snake` — order reverses each round (1-2-3, 3-2-1, 1-2-3, 3-2-1...)
 5. **Players per team** — user-defined, **min 11, max 18**. Applies across all
    draft styles (single shared config value, asked once, not per-style).
 
@@ -207,8 +226,9 @@ interface DraftConfig {
   mode: 'match' | 'tournament';
   tournament?: {
     teamCount: number;
-    format: 'league' | 'knockout' | 'ucl'; // ucl = MVP+ later, rules TBD
-    knockoutLegs?: 'single' | 'double';
+    format: 'league' | 'knockout' | 'ucl';
+    knockoutLegs?: 'single' | 'double'; // knockout only, every round
+    leagueLegs?: 'single' | 'double'; // league only, home & away
   };
   draftOrder: {
     randomize: boolean; // true = spin the wheel, false = the user orders by hand
@@ -272,7 +292,15 @@ when draft/tournament logic is implemented.
 - Fixture order: **settled** — always a random draw, no seeding (see step 2).
   The engine lives in `packages/shared/src/tournament.ts` and is wired to the
   UI: `TournamentScreen` (table + week-by-week fixtures, or the bracket),
-  `Bracket`, `StandingsTable`, and `ChampionScreen` for the trophy.
+  `Bracket`, `StandingsTable`, and `ChampionScreen` for the trophy. The
+  celebration replaces the whole tournament screen, so `ChampionScreen` also
+  carries a **Tournament summary** toggle (added 2026-09-21) that unfolds
+  `TournamentSummary`: the final table plus every match played, grouped by
+  week and by knockout round, with legs, aggregates and shootout winners. It
+  is **read only** — the tournament is over, and letting a score be edited
+  there would silently un-crown the champion. Opening it scrolls the page down
+  to the recap and closing it scrolls back up to the trophy: the celebration
+  is a screenful on its own, so otherwise the panel opens off-screen.
 - Draft order: **settled** — wheel draw or manual ordering, the user picks
   which (see step 3).
 - Fake pool is generated (20 clubs x 20 players) in

@@ -85,6 +85,10 @@
       "knockout": "Eleme",
       "ucl": "Şampiyonlar Ligi"
     },
+    "leagueLegs": {
+      "single": "Tek devre",
+      "double": "Ev ve deplasman"
+    },
     "knockoutLegs": {
       "single": "Tek maç",
       "double": "Çift maç (iç saha & deplasman)"
@@ -134,6 +138,9 @@
       "knockoutDesc": "Kaybeden elenir.",
       "uclDesc": "Önce herkes birbiriyle oynar, sonra üst sıradakiler eleme turuna kalır. Elemeler çift ayaklı, final tek maç.",
       "legs": "Eleme maçları",
+      "leagueLegs": "Her eşleşme kaç kez oynansın?",
+      "leagueSingleDesc": "Herkes herkesle bir kez oynar.",
+      "leagueDoubleDesc": "Herkes herkesle iki kez oynar — ikinci devre birinci devrenin tersi, yani her takım her rakibini bir kez ağırlar.",
       "note": "Fikstür kurayla çekilir. Skorları sen girersin; tablo ve eşleşmeler kendiliğinden güncellenir.",
       "legsSingleDesc": "Tur tek maçta biter.",
       "legsDoubleDesc": "İç saha + deplasman; toplam skor belirler. Toplamda eşitlik olursa penaltılara gider.",
@@ -195,7 +202,7 @@
       "repeatOnSummary": "Evet, kulüp başına en fazla {{max}} oyuncu",
       "maxPerTeam": "Bir kulüpten en fazla oyuncu",
       "notEnoughClubs": "Kulüp sayısı yetmiyor: {{needed}} gerekli, havuzda {{available}} var.",
-      "rerollsHint": "Sıra sende rastgele bir kulüp açılır ve o kulübün kadrosundan seçersin. Kulübü beğenmezsen bu haklardan birini kullanıp yerine başka bir rastgele kulüp açarsın. Hakkın bitince çıkan kulüpten seçmek zorundasın. Bu hak draft boyunca geçerlidir ve herkese ayrı ayrı verilir.",
+      "rerollsHint": "Sıra sendeyken rastgele bir kulüp açılır ve o kulübün kadrosundan seçersin. Kulübü beğenmezsen bu haklardan birini kullanıp yerine başka bir rastgele kulüp açarsın. Hakkın bitince çıkan kulüpten seçmek zorundasın. Bu hak draft boyunca geçerlidir ve herkese ayrı ayrı verilir.",
       "rerollsShort": "Takım değiştirme hakkı"
     },
     "yourChoice": {
@@ -242,10 +249,10 @@
     "rollTeam": "Rastgele takım getir",
     "yourTeam": "Takımın",
     "rollFirst": "Önce bir takım aç.",
-    "clubExhausted": "Bu kulüpten {{max}} oyuncu aldın — takımı değiştir, hakkından düşmez.",
-    "rerollPool": "Takım değiştirme hakkı",
+    "clubExhausted": "Bu kulüpten {{max}} oyuncu aldın — reroll yap, hakkından düşmez.",
+    "rerollPool": "Kalan reroll hakkı",
     "rerollsLeft": "{{total}} hakkın {{left}} tanesi kaldı",
-    "anotherTeam": "Takımı değiştir",
+    "anotherTeam": "Reroll",
     "freeReroll": "ücretsiz",
     "rolling": "Çekiliyor…",
     "clubLimitFull": "{{club}} takımından oyuncu limitini doldurdun ({{max}}) — başka takımdan seç.",
@@ -286,6 +293,8 @@
     "team": "Takım",
     "tbd": "?",
     "bye": "Bay geçti",
+    "allMatches": "Bütün maçlar",
+    "penaltyWinner": "{{name}} penaltılarla kazandı",
     "bracketHint": "Skorları gir; kazananlar bir sonraki tura kendiliğinden geçer.",
     "qualifyNote": "İlk {{top}} takım eleme turuna çıkar. {{remaining}} maç kaldı.",
     "leagueDone": "Lig aşaması bitti — eleme kuraları tabloya göre yapıldı.",
@@ -319,6 +328,8 @@
   "champion": {
     "title": "Şampiyon",
     "squads": "Kadroları gör",
+    "summary": "Turnuva özeti",
+    "hideSummary": "Özeti gizle",
     "again": "Yeni draft"
   },
   "pitch": {

@@ -124,147 +124,392 @@ export interface FormationSlot {
 }
 
 /**
- * The eleven slots on the pitch. Some positions repeat (two centre-backs) and
- * some sit out — that is what a real shape looks like, and it is why "one of
- * every position key" is not the rule here.
+ * How high up the pitch the lines sit and, more importantly, what the central
+ * roles are. This is a layout table only — there is no tactics engine behind
+ * it, nothing else in the app reads it, and it never constrains the draft.
  */
-export const FORMATIONS: Record<string, readonly FormationSlot[]> = {
-  '4-3-3': [
-    { position: 'GK', x: 50, y: 92 },
-    { position: 'RB', x: 85, y: 71 },
-    { position: 'CB', x: 63, y: 76 },
-    { position: 'CB', x: 37, y: 76 },
-    { position: 'LB', x: 15, y: 71 },
-    { position: 'CDM', x: 50, y: 56 },
-    { position: 'CM', x: 72, y: 45 },
-    { position: 'CM', x: 28, y: 45 },
-    { position: 'RW', x: 82, y: 22 },
-    { position: 'ST', x: 50, y: 15 },
-    { position: 'LW', x: 18, y: 22 },
-  ],
-  '4-4-2': [
-    { position: 'GK', x: 50, y: 92 },
-    { position: 'RB', x: 85, y: 71 },
-    { position: 'CB', x: 63, y: 76 },
-    { position: 'CB', x: 37, y: 76 },
-    { position: 'LB', x: 15, y: 71 },
-    { position: 'RM', x: 84, y: 48 },
-    { position: 'CM', x: 62, y: 51 },
-    { position: 'CM', x: 38, y: 51 },
-    { position: 'LM', x: 16, y: 48 },
-    { position: 'ST', x: 62, y: 18 },
-    { position: 'ST', x: 38, y: 18 },
-  ],
-  '4-2-3-1': [
-    { position: 'GK', x: 50, y: 92 },
-    { position: 'RB', x: 85, y: 71 },
-    { position: 'CB', x: 63, y: 76 },
-    { position: 'CB', x: 37, y: 76 },
-    { position: 'LB', x: 15, y: 71 },
-    { position: 'CDM', x: 62, y: 57 },
-    { position: 'CDM', x: 38, y: 57 },
-    { position: 'RM', x: 82, y: 33 },
-    { position: 'CAM', x: 50, y: 36 },
-    { position: 'LM', x: 18, y: 33 },
-    { position: 'ST', x: 50, y: 14 },
-  ],
-  '3-5-2': [
-    { position: 'GK', x: 50, y: 92 },
-    { position: 'CB', x: 72, y: 76 },
-    { position: 'CB', x: 50, y: 78 },
-    { position: 'CB', x: 28, y: 76 },
-    { position: 'CDM', x: 50, y: 58 },
-    { position: 'CM', x: 68, y: 47 },
-    { position: 'CM', x: 32, y: 47 },
-    { position: 'RM', x: 88, y: 42 },
-    { position: 'LM', x: 12, y: 42 },
-    { position: 'ST', x: 62, y: 18 },
-    { position: 'ST', x: 38, y: 18 },
-  ],
-  '4-2-4': [
-    { position: 'GK', x: 50, y: 92 },
-    { position: 'RB', x: 85, y: 71 },
-    { position: 'CB', x: 63, y: 76 },
-    { position: 'CB', x: 37, y: 76 },
-    { position: 'LB', x: 15, y: 71 },
-    { position: 'CM', x: 64, y: 50 },
-    { position: 'CM', x: 36, y: 50 },
-    { position: 'RW', x: 84, y: 22 },
-    { position: 'ST', x: 61, y: 15 },
-    { position: 'ST', x: 39, y: 15 },
-    { position: 'LW', x: 16, y: 22 },
-  ],
-  '5-3-2': [
-    { position: 'GK', x: 50, y: 92 },
-    { position: 'RB', x: 90, y: 68 },
-    { position: 'CB', x: 68, y: 78 },
-    { position: 'CB', x: 50, y: 80 },
-    { position: 'CB', x: 32, y: 78 },
-    { position: 'LB', x: 10, y: 68 },
-    { position: 'CDM', x: 50, y: 55 },
-    { position: 'CM', x: 70, y: 45 },
-    { position: 'CM', x: 30, y: 45 },
-    { position: 'ST', x: 62, y: 18 },
-    { position: 'ST', x: 38, y: 18 },
-  ],
-  '4-5-1': [
-    { position: 'GK', x: 50, y: 92 },
-    { position: 'RB', x: 85, y: 71 },
-    { position: 'CB', x: 63, y: 76 },
-    { position: 'CB', x: 37, y: 76 },
-    { position: 'LB', x: 15, y: 71 },
-    { position: 'RM', x: 86, y: 45 },
-    { position: 'CM', x: 66, y: 52 },
-    { position: 'CM', x: 34, y: 52 },
-    { position: 'CAM', x: 50, y: 36 },
-    { position: 'LM', x: 14, y: 45 },
-    { position: 'ST', x: 50, y: 14 },
-  ],
-  '3-4-3': [
-    { position: 'GK', x: 50, y: 92 },
-    { position: 'CB', x: 72, y: 76 },
-    { position: 'CB', x: 50, y: 78 },
-    { position: 'CB', x: 28, y: 76 },
-    { position: 'RM', x: 86, y: 47 },
-    { position: 'CM', x: 63, y: 51 },
-    { position: 'CM', x: 37, y: 51 },
-    { position: 'LM', x: 14, y: 47 },
-    { position: 'RW', x: 80, y: 21 },
-    { position: 'ST', x: 50, y: 15 },
-    { position: 'LW', x: 20, y: 21 },
-  ],
+export const TACTICS = ['defensive', 'balanced', 'attacking'] as const;
+export type Tactic = (typeof TACTICS)[number];
+
+const at = (position: Position, x: number, y: number): FormationSlot => ({
+  position,
+  x,
+  y,
+});
+
+/**
+ * Every shape, in all three styles. A style is not a vertical nudge: the
+ * central midfield walks the DM -> CM -> AM ladder, full-backs turn into
+ * wing-backs going forward and fall back into the defensive line going back,
+ * and some shapes change character outright (4-4-2 becomes a diamond when
+ * attacking, 4-5-1 drops its wide midfielders for a second number ten).
+ *
+ * `x` runs 0 (left touchline) to 100 (right), `y` runs 0 (the goal being
+ * attacked) to 100 (your own), so the keeper sits at y = 92 in every entry.
+ */
+const SHAPES: Record<string, Record<Tactic, readonly FormationSlot[]>> = {
+  '4-3-3': {
+    // Double pivot with one midfielder pushed on.
+    defensive: [
+      at('GK', 50, 92),
+      at('RB', 84, 75),
+      at('CB', 62, 79),
+      at('CB', 38, 79),
+      at('LB', 16, 75),
+      at('CDM', 62, 60),
+      at('CDM', 38, 60),
+      at('CM', 50, 50),
+      at('RW', 83, 26),
+      at('ST', 50, 19),
+      at('LW', 17, 26),
+    ],
+    // Single pivot, a runner and a ten ahead of it.
+    balanced: [
+      at('GK', 50, 92),
+      at('RB', 85, 73),
+      at('CB', 62, 76),
+      at('CB', 38, 76),
+      at('LB', 15, 73),
+      at('CDM', 50, 59),
+      at('CM', 66, 48),
+      at('CAM', 34, 48),
+      at('RW', 84, 23),
+      at('ST', 50, 16),
+      at('LW', 16, 23),
+    ],
+    attacking: [
+      at('GK', 50, 92),
+      at('RB', 86, 66),
+      at('CB', 62, 76),
+      at('CB', 38, 76),
+      at('LB', 14, 66),
+      at('CM', 50, 57),
+      at('CM', 66, 45),
+      at('CAM', 34, 45),
+      at('RW', 85, 20),
+      at('ST', 50, 13),
+      at('LW', 15, 20),
+    ],
+  },
+  '4-4-2': {
+    // Flat bank of four, both central men sitting, front two dropped off.
+    defensive: [
+      at('GK', 50, 92),
+      at('RB', 84, 76),
+      at('CB', 62, 76),
+      at('CB', 38, 76),
+      at('LB', 16, 76),
+      at('RM', 85, 57),
+      at('CDM', 62, 58),
+      at('CDM', 38, 58),
+      at('LM', 15, 57),
+      at('ST', 60, 38),
+      at('ST', 40, 38),
+    ],
+    balanced: [
+      at('GK', 50, 92),
+      at('RB', 85, 74),
+      at('CB', 62, 75),
+      at('CB', 38, 75),
+      at('LB', 15, 74),
+      at('RM', 86, 53),
+      at('CDM', 62, 56),
+      at('CM', 38, 52),
+      at('LM', 14, 53),
+      at('ST', 60, 30),
+      at('ST', 40, 30),
+    ],
+    // The wide pair tucks in: this is a midfield diamond, not a flat four.
+    attacking: [
+      at('GK', 50, 92),
+      at('RB', 86, 66),
+      at('CB', 62, 75),
+      at('CB', 38, 75),
+      at('LB', 14, 66),
+      at('CDM', 50, 59),
+      at('CM', 67, 49),
+      at('CM', 33, 49),
+      at('CAM', 50, 38),
+      at('ST', 61, 17),
+      at('ST', 39, 17),
+    ],
+  },
+  '4-2-3-1': {
+    defensive: [
+      at('GK', 50, 92),
+      at('RB', 84, 77),
+      at('CB', 62, 77),
+      at('CB', 38, 77),
+      at('LB', 16, 77),
+      at('CDM', 61, 65),
+      at('CDM', 39, 65),
+      at('RW', 83, 50),
+      at('CAM', 50, 50),
+      at('LW', 17, 50),
+      at('ST', 50, 32),
+    ],
+    balanced: [
+      at('GK', 50, 92),
+      at('RB', 85, 74),
+      at('CB', 62, 74),
+      at('CB', 38, 74),
+      at('LB', 15, 74),
+      at('CDM', 61, 57),
+      at('CM', 39, 57),
+      at('RW', 84, 44),
+      at('CAM', 50, 44),
+      at('LW', 16, 44),
+      at('ST', 50, 23),
+    ],
+    attacking: [
+      at('GK', 50, 92),
+      at('RB', 88, 63),
+      at('CB', 62, 77),
+      at('CB', 38, 77),
+      at('LB', 12, 63),
+      at('CM', 61, 54),
+      at('CM', 39, 54),
+      at('RW', 86, 39),
+      at('CAM', 50, 39),
+      at('LW', 14, 39),
+      at('ST', 50, 18),
+    ],
+  },
+  '4-2-4': {
+    // The front four go flat across: nobody drops in to help the two holders.
+    defensive: [
+      at('GK', 50, 92),
+      at('RB', 84, 78),
+      at('CB', 62, 78),
+      at('CB', 38, 78),
+      at('LB', 16, 78),
+      at('CDM', 61, 65),
+      at('CDM', 39, 65),
+      at('RW', 84, 24),
+      at('ST', 60, 24),
+      at('ST', 40, 24),
+      at('LW', 16, 24),
+    ],
+    balanced: [
+      at('GK', 50, 92),
+      at('RB', 85, 75),
+      at('CB', 62, 75),
+      at('CB', 38, 75),
+      at('LB', 15, 75),
+      at('CDM', 38, 57),
+      at('CM', 62, 57),
+      at('RW', 85, 23),
+      at('ST', 60, 20),
+      at('ST', 40, 20),
+      at('LW', 15, 23),
+    ],
+    attacking: [
+      at('GK', 50, 92),
+      at('RB', 88, 62),
+      at('CB', 62, 76),
+      at('CB', 38, 76),
+      at('LB', 12, 62),
+      at('CM', 38, 50),
+      at('CAM', 62, 50),
+      at('RW', 86, 22),
+      at('ST', 60, 16),
+      at('ST', 40, 16),
+      at('LW', 14, 22),
+    ],
+  },
+  '3-5-2': {
+    // Wing-backs drop level with the midfield, two holders screen the three.
+    defensive: [
+      at('GK', 50, 92),
+      at('CB', 70, 78),
+      at('CB', 50, 80),
+      at('CB', 30, 78),
+      at('RM', 90, 66),
+      at('CDM', 62, 63),
+      at('CDM', 38, 63),
+      at('CM', 50, 55),
+      at('LM', 10, 66),
+      at('ST', 60, 27),
+      at('ST', 40, 27),
+    ],
+    balanced: [
+      at('GK', 50, 92),
+      at('CB', 70, 76),
+      at('CB', 50, 78),
+      at('CB', 30, 76),
+      at('RM', 88, 48),
+      at('CM', 66, 52),
+      at('CDM', 50, 59),
+      at('CM', 34, 52),
+      at('LM', 12, 48),
+      at('ST', 60, 19),
+      at('ST', 40, 19),
+    ],
+    // The wide men are wingers now, not wing-backs.
+    attacking: [
+      at('GK', 50, 92),
+      at('CB', 70, 78),
+      at('CB', 50, 80),
+      at('CB', 30, 78),
+      at('RW', 87, 24),
+      at('CM', 66, 54),
+      at('CAM', 50, 44),
+      at('CM', 34, 54),
+      at('LW', 13, 24),
+      at('ST', 60, 15),
+      at('ST', 40, 15),
+    ],
+  },
+  '5-3-2': {
+    // A flat back five: the wing-backs are just full-backs here.
+    defensive: [
+      at('GK', 50, 92),
+      at('RB', 90, 76),
+      at('CB', 68, 78),
+      at('CB', 50, 80),
+      at('CB', 32, 78),
+      at('LB', 10, 76),
+      at('CDM', 64, 62),
+      at('CDM', 36, 62),
+      at('CM', 50, 52),
+      at('ST', 60, 30),
+      at('ST', 40, 30),
+    ],
+    balanced: [
+      at('GK', 50, 92),
+      at('RB', 90, 52),
+      at('CB', 68, 76),
+      at('CB', 50, 78),
+      at('CB', 32, 76),
+      at('LB', 10, 52),
+      at('CDM', 66, 60),
+      at('CM', 50, 53),
+      at('CAM', 34, 45),
+      at('ST', 60, 20),
+      at('ST', 40, 20),
+    ],
+    // Wing-backs end up higher up the pitch than the midfield three.
+    attacking: [
+      at('GK', 50, 92),
+      at('RB', 91, 40),
+      at('CB', 68, 77),
+      at('CB', 50, 79),
+      at('CB', 32, 77),
+      at('LB', 9, 40),
+      at('CM', 66, 56),
+      at('CM', 50, 50),
+      at('CAM', 34, 41),
+      at('ST', 60, 15),
+      at('ST', 40, 15),
+    ],
+  },
+  '4-5-1': {
+    // Five across, two of them holding; the lone striker is left up top.
+    defensive: [
+      at('GK', 50, 92),
+      at('RB', 84, 76),
+      at('CB', 62, 77),
+      at('CB', 38, 77),
+      at('LB', 16, 76),
+      at('RM', 86, 60),
+      at('CDM', 66, 63),
+      at('CDM', 50, 63),
+      at('CM', 34, 63),
+      at('LM', 14, 60),
+      at('ST', 50, 22),
+    ],
+    balanced: [
+      at('GK', 50, 92),
+      at('RB', 86, 73),
+      at('CB', 62, 75),
+      at('CB', 38, 75),
+      at('LB', 14, 73),
+      at('RM', 87, 48),
+      at('CM', 66, 50),
+      at('CDM', 50, 60),
+      at('CAM', 34, 44),
+      at('LM', 13, 48),
+      at('ST', 50, 17),
+    ],
+    // No wide midfielders at all: one holder, two runners, two tens.
+    attacking: [
+      at('GK', 50, 92),
+      at('RB', 88, 66),
+      at('CB', 62, 76),
+      at('CB', 38, 76),
+      at('LB', 12, 66),
+      at('CDM', 50, 62),
+      at('CM', 68, 51),
+      at('CM', 32, 51),
+      at('CAM', 66, 39),
+      at('CAM', 34, 39),
+      at('ST', 50, 16),
+    ],
+  },
+  '3-4-3': {
+    defensive: [
+      at('GK', 50, 92),
+      at('CB', 70, 78),
+      at('CB', 50, 80),
+      at('CB', 30, 78),
+      at('RM', 88, 62),
+      at('CM', 64, 62),
+      at('CDM', 36, 62),
+      at('LM', 12, 62),
+      at('RW', 81, 25),
+      at('ST', 50, 21),
+      at('LW', 19, 25),
+    ],
+    balanced: [
+      at('GK', 50, 92),
+      at('CB', 70, 77),
+      at('CB', 50, 79),
+      at('CB', 30, 77),
+      at('RM', 88, 46),
+      at('CM', 64, 56),
+      at('CM', 36, 56),
+      at('LM', 12, 46),
+      at('RW', 82, 22),
+      at('ST', 50, 17),
+      at('LW', 18, 22),
+    ],
+    // The wide midfielders push almost level with the front three.
+    attacking: [
+      at('GK', 50, 92),
+      at('CB', 70, 78),
+      at('CB', 50, 80),
+      at('CB', 30, 78),
+      at('RM', 91, 30),
+      at('CAM', 64, 48),
+      at('CM', 36, 48),
+      at('LM', 9, 30),
+      at('RW', 80, 18),
+      at('ST', 50, 14),
+      at('LW', 20, 18),
+    ],
+  },
 };
 
-export const FORMATION_NAMES = Object.keys(FORMATIONS);
+/**
+ * The shapes as the draft sees them — balanced is the canonical variant, and
+ * it is what a Gambler squad is dealt against, so changing the style on screen
+ * never rewrites who was handed out.
+ */
+export const FORMATIONS: Record<string, readonly FormationSlot[]> =
+  Object.fromEntries(
+    Object.entries(SHAPES).map(([name, styles]) => [name, styles.balanced]),
+  );
+
+export const FORMATION_NAMES = Object.keys(SHAPES);
 
 /** The positions a shape asks for, in slot order. */
 export function formationPositions(name: string): Position[] {
   return (FORMATIONS[name] ?? []).map((slot) => slot.position);
 }
 
-/**
- * How high up the pitch the outfield lines sit. Purely a layout shift — the
- * app has no tactics engine behind it, and nothing else reads this.
- */
-export const TACTICS = ['defensive', 'balanced', 'attacking'] as const;
-export type Tactic = (typeof TACTICS)[number];
-
-const TACTIC_SHIFT: Record<Tactic, number> = {
-  defensive: 7,
-  balanced: 0,
-  attacking: -7,
-};
-
-/** A shape's slots with the tactic applied. The keeper never moves. */
+/** A shape's slots in the chosen style. */
 export function shapeFor(name: string, tactic: Tactic): FormationSlot[] {
-  const shift = TACTIC_SHIFT[tactic];
-  return (FORMATIONS[name] ?? []).map((slot, index) =>
-    index === 0 ? { ...slot } : { ...slot, y: clampPercent(slot.y + shift) },
-  );
-}
-
-function clampPercent(value: number): number {
-  return Math.min(96, Math.max(8, value));
+  return (SHAPES[name]?.[tactic] ?? []).map((slot) => ({ ...slot }));
 }
 
 /**

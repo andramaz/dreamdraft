@@ -25,8 +25,9 @@ export type DraftMode = (typeof DRAFT_MODES)[number];
 export const TOURNAMENT_FORMATS = ['league', 'knockout', 'ucl'] as const;
 export type TournamentFormat = (typeof TOURNAMENT_FORMATS)[number];
 
-export const KNOCKOUT_LEGS = ['single', 'double'] as const;
-export type KnockoutLegs = (typeof KNOCKOUT_LEGS)[number];
+/** One game, or home and away. Used by both a knockout tie and a league. */
+export const LEGS = ['single', 'double'] as const;
+export type Legs = (typeof LEGS)[number];
 
 export const PICK_PATTERNS = ['straight', 'snake'] as const;
 export type PickPattern = (typeof PICK_PATTERNS)[number];
@@ -42,7 +43,15 @@ export type DraftStyle = (typeof DRAFT_STYLES)[number];
 export interface TournamentConfig {
   teamCount: number;
   format: TournamentFormat;
-  knockoutLegs?: KnockoutLegs;
+  /** `knockout` only: applies to every round, the final included. */
+  knockoutLegs?: Legs;
+  /**
+   * `league` only (added 2026-09-21): `double` plays the round robin twice,
+   * the second half with the fixtures reversed, so everyone gets a home game
+   * against everyone. A `ucl` league phase is always single — see
+   * `buildLeagueFixtures`.
+   */
+  leagueLegs?: Legs;
 }
 
 export const REROLLS_MIN = 3;

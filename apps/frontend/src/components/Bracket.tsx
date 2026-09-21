@@ -6,6 +6,7 @@ import {
   type TournamentState,
 } from '@dreamdraft/shared';
 import { useTranslation } from 'react-i18next';
+import { useRoundLabel } from './roundLabel';
 import { ScoreInput } from './ScoreInput';
 
 interface BracketProps {
@@ -17,18 +18,6 @@ interface BracketProps {
     away: number | null,
   ) => void;
   onShootout: (tieId: string, participantId: string | null) => void;
-}
-
-/** "Final", "Semi-finals", … counted back from the last round. */
-function useRoundLabel() {
-  const { t } = useTranslation();
-  return (round: number, lastRound: number) => {
-    const left = lastRound - round;
-    if (left === 0) return t('tournament.rounds.final');
-    if (left === 1) return t('tournament.rounds.semi');
-    if (left === 2) return t('tournament.rounds.quarter');
-    return t('tournament.rounds.roundOf', { teams: 2 ** (left + 1) });
-  };
 }
 
 export function Bracket({ state, nameOf, onScore, onShootout }: BracketProps) {

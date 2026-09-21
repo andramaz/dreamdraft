@@ -48,7 +48,7 @@ export function Pitch({
             style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
           >
             <span
-              className={`flex size-12 items-center justify-center rounded-full border-2 font-display text-xs font-bold tracking-wide transition ${
+              className={`flex size-13 items-center justify-center rounded-full border-2 font-display text-xs font-bold tracking-wide transition ${
                 isSelected
                   ? 'scale-110 border-gold bg-gold/25 text-gold shadow-[0_0_22px] shadow-gold/40'
                   : player
@@ -61,7 +61,7 @@ export function Pitch({
               {player ? player.rating : t(`positions.short.${slot.position}`)}
             </span>
             <span
-              className={`max-w-24 truncate rounded px-1 text-[0.65rem] leading-tight font-semibold ${
+              className={`max-w-26 truncate rounded px-1 text-[0.65rem] leading-tight font-semibold ${
                 player ? 'text-white' : 'text-silver/50'
               }`}
               lang={player ? 'en' : undefined}
@@ -77,7 +77,7 @@ export function Pitch({
   );
 }
 
-/** Surnames only — a full name never fits under a 48px marker. */
+/** Surnames only — a full name never fits under a 52px marker. */
 function lastName(name: string): string {
   const parts = name.trim().split(/\s+/);
   return parts.length > 1 ? parts[parts.length - 1]! : name;

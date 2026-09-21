@@ -1,4 +1,4 @@
-import type { KnockoutLegs, TournamentFormat } from './draft-config.js';
+import type { Legs, TournamentFormat } from './draft-config.js';
 import type { Participant } from './draft-engine.js';
 import { shuffle, type Rng } from './rng.js';
 
@@ -34,7 +34,9 @@ export interface TournamentState {
    * The `knockout` format's choice, applied to every round. A `ucl` ignores it
    * and works its legs out per round — see `roundLegs`.
    */
-  legs: KnockoutLegs;
+  legs: Legs;
+  /** `league` only: `double` means everyone plays everyone home and away. */
+  leagueLegs: Legs;
   participants: Participant[];
   /** The draw: the league line-up, or the pool the bracket was filled from. */
   order: string[];
@@ -68,7 +70,8 @@ export interface CreateTournamentArgs {
   /** Draft pick order — the pool the draw is made from. */
   order: string[];
   format: TournamentFormat;
-  legs?: KnockoutLegs;
+  legs?: Legs;
+  leagueLegs?: Legs;
   rng: Rng;
 }
 
@@ -77,6 +80,7 @@ export function createTournament({
   order,
   format,
   legs = 'single',
+  leagueLegs = 'single',
   rng,
 }: CreateTournamentArgs): TournamentState {
   if (participants.length < 2) {
@@ -90,6 +94,7 @@ export function createTournament({
   const state: TournamentState = {
     format,
     legs,
+    leagueLegs,
     participants,
     order: seeding,
     ties: [],
@@ -104,8 +109,13 @@ export function createTournament({
     return advance(state);
   }
 
-  // A league and a ucl both open with the same round robin.
-  state.fixtures = buildLeagueFixtures(seeding);
+  // A league and a ucl both open with a round robin. Only a plain league may
+  // play it twice: a ucl league phase mirrors the real competition, where
+  // everyone plays the same number of one-off games.
+  state.fixtures = buildLeagueFixtures(
+    seeding,
+    format === 'league' ? leagueLegs : 'single',
+  );
   return state;
 }
 
@@ -118,8 +128,37 @@ export function qualifierCount(teamCount: number): number {
   return 2 ** Math.max(1, Math.ceil(Math.log2(teamCount)) - 1);
 }
 
-/** Single round robin (circle method): every pair meets exactly once. */
-export function buildLeagueFixtures(teamIds: readonly string[]): Fixture[] {
+/**
+ * The league calendar. `single` is one round robin — every pair meets once.
+ * `double` replays it with the fixtures reversed, so the second half of the
+ * season is the first half at the other ground.
+ */
+export function buildLeagueFixtures(
+  teamIds: readonly string[],
+  legs: Legs = 'single',
+): Fixture[] {
+  const first = singleRoundRobin(teamIds);
+  if (legs === 'single') return first;
+
+  const half = Math.max(0, ...first.map((fixture) => fixture.round));
+  const reverse = first.map((fixture) => {
+    const round = fixture.round + half;
+    const id = `r${round}-${fixture.id.split('-')[1]}`;
+    return {
+      ...fixture,
+      id,
+      tieId: id,
+      round,
+      // The return leg: whoever was away is at home now.
+      homeId: fixture.awayId,
+      awayId: fixture.homeId,
+    };
+  });
+  return [...first, ...reverse];
+}
+
+/** Circle method: every pair meets exactly once. */
+function singleRoundRobin(teamIds: readonly string[]): Fixture[] {
   const teams: (string | null)[] = [...teamIds];
   if (teams.length % 2 === 1) teams.push(null); // bye slot
 
@@ -214,7 +253,7 @@ export function knockoutRounds(state: TournamentState): number {
  * leg is at home. A plain `knockout` applies whatever the user chose to every
  * round, final included.
  */
-export function roundLegs(state: TournamentState, round: number): KnockoutLegs {
+export function roundLegs(state: TournamentState, round: number): Legs {
   if (state.format !== 'ucl') return state.legs;
   return round === knockoutRounds(state) ? 'single' : 'double';
 }

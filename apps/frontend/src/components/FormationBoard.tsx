@@ -64,7 +64,7 @@ export function FormationBoard({
   };
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,30rem)_minmax(0,1fr)]">
       <div className="flex flex-col gap-3">
         <Pitch
           formation={choice.formation}

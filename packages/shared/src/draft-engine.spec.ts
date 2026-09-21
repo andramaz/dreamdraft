@@ -17,7 +17,9 @@ import {
   rerollsLeft,
   rollClub,
   rollableClubs,
+  shapeFor,
   squads,
+  TACTICS,
   yourChoiceLimit,
   type Participant,
 } from './draft-engine.js';
@@ -609,6 +611,72 @@ describe('fillShape', () => {
         1,
       );
     }
+  });
+});
+
+describe('shapeFor', () => {
+  it('lays out eleven slots with one keeper in every style', () => {
+    for (const name of FORMATION_NAMES) {
+      for (const tactic of TACTICS) {
+        const shape = shapeFor(name, tactic);
+        expect(shape, `${name} ${tactic}`).toHaveLength(11);
+        expect(
+          shape.filter((slot) => slot.position === 'GK'),
+          `${name} ${tactic}`,
+        ).toHaveLength(1);
+        for (const slot of shape) {
+          expect(slot.x).toBeGreaterThanOrEqual(0);
+          expect(slot.x).toBeLessThanOrEqual(100);
+          expect(slot.y).toBeGreaterThanOrEqual(0);
+          expect(slot.y).toBeLessThanOrEqual(100);
+        }
+      }
+    }
+  });
+
+  it('changes the roles, not just the depth, between styles', () => {
+    for (const name of FORMATION_NAMES) {
+      const roles = TACTICS.map((tactic) =>
+        shapeFor(name, tactic)
+          .map((slot) => slot.position)
+          .join(','),
+      );
+      expect(new Set(roles).size, name).toBe(3);
+    }
+  });
+
+  it('never moves the keeper off his line', () => {
+    for (const name of FORMATION_NAMES) {
+      for (const tactic of TACTICS) {
+        expect(shapeFor(name, tactic)[0]).toEqual({
+          position: 'GK',
+          x: 50,
+          y: 92,
+        });
+      }
+    }
+  });
+
+  it('pushes the outfield further forward the more attacking the style', () => {
+    for (const name of FORMATION_NAMES) {
+      const depth = TACTICS.map((tactic) => {
+        const outfield = shapeFor(name, tactic).slice(1);
+        return outfield.reduce((sum, slot) => sum + slot.y, 0) / 10;
+      });
+      const [defensive, balanced, attacking] = depth as [
+        number,
+        number,
+        number,
+      ];
+      expect(defensive, name).toBeGreaterThan(balanced);
+      expect(balanced, name).toBeGreaterThan(attacking);
+    }
+  });
+
+  it('hands back a copy, so a caller cannot edit the table', () => {
+    const shape = shapeFor('4-3-3', 'balanced');
+    shape[0]!.y = 1;
+    expect(shapeFor('4-3-3', 'balanced')[0]!.y).toBe(92);
   });
 });
 

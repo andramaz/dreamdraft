@@ -29,6 +29,7 @@ function make(
   count: number,
   format: 'league' | 'knockout' | 'ucl',
   legs: 'single' | 'double' = 'single',
+  leagueLegs: 'single' | 'double' = 'single',
 ): TournamentState {
   const participants = makeParticipants(count);
   return createTournament({
@@ -36,6 +37,7 @@ function make(
     order: participants.map((p) => p.id),
     format,
     legs,
+    leagueLegs,
     rng: createRng(42),
   });
 }
@@ -92,6 +94,50 @@ describe('league', () => {
     const state = playAll(make(4, 'league'), seedWins);
     expect(isTournamentComplete(state)).toBe(true);
     expect(champion(state)).toBe('p1');
+  });
+
+  describe('home and away', () => {
+    it('plays the round robin twice', () => {
+      const single = make(4, 'league');
+      const double = make(4, 'league', 'single', 'double');
+      expect(leagueFixtures(double)).toHaveLength(
+        leagueFixtures(single).length * 2,
+      );
+      expect(new Set(double.fixtures.map((f) => f.round)).size).toBe(6);
+    });
+
+    it('reverses the second half, so every pair meets home and away', () => {
+      const state = make(4, 'league', 'single', 'double');
+      const pairs = new Map<string, string[]>();
+      for (const fixture of leagueFixtures(state)) {
+        const key = [fixture.homeId, fixture.awayId].sort().join('-');
+        pairs.set(key, [...(pairs.get(key) ?? []), fixture.homeId]);
+      }
+      expect(pairs.size).toBe(6);
+      for (const [pair, hosts] of pairs) {
+        expect(hosts, pair).toHaveLength(2);
+        expect(new Set(hosts).size, pair).toBe(2);
+      }
+    });
+
+    it('gives every fixture its own id', () => {
+      const ids = make(5, 'league', 'single', 'double').fixtures.map(
+        (fixture) => fixture.id,
+      );
+      expect(new Set(ids).size).toBe(ids.length);
+    });
+
+    it('counts both games in the table', () => {
+      const state = playAll(make(4, 'league', 'single', 'double'), seedWins);
+      const rows = standings(state);
+      expect(rows.every((row) => row.played === 6)).toBe(true);
+      expect(champion(state)).toBe('p1');
+    });
+
+    it('leaves a ucl league phase single, whatever is asked for', () => {
+      const state = make(4, 'ucl', 'single', 'double');
+      expect(leagueFixtures(state)).toHaveLength(6);
+    });
   });
 });
 

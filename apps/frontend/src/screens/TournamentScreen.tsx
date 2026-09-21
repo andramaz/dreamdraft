@@ -12,6 +12,7 @@ import { Bracket } from '../components/Bracket';
 import { Button } from '../components/Button';
 import { FixtureRow } from '../components/FixtureRow';
 import { StandingsTable } from '../components/StandingsTable';
+import { TournamentSummary } from '../components/TournamentSummary';
 import { ChampionScreen } from './ChampionScreen';
 
 interface TournamentScreenProps {
@@ -50,6 +51,7 @@ export function TournamentScreen({
         competition={competition}
         onSquads={onSquads}
         onRestart={onRestart}
+        summary={<TournamentSummary state={state} nameOf={nameOf} />}
       />
     );
   }

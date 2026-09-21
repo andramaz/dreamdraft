@@ -134,6 +134,7 @@ export function useDraftFlow(players: Player[]) {
           order: state.order,
           format: state.config.tournament.format,
           legs: state.config.tournament.knockoutLegs,
+          leagueLegs: state.config.tournament.leagueLegs,
           rng: createRng(randomSeed()),
         }),
       );

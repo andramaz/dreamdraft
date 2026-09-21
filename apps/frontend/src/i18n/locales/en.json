@@ -89,6 +89,10 @@
       "single": "Single leg",
       "double": "Two legs (home & away)"
     },
+    "leagueLegs": {
+      "single": "Single round",
+      "double": "Home & away"
+    },
     "pickPattern": {
       "straight": "Straight",
       "snake": "Snake"
@@ -134,6 +138,9 @@
       "knockoutDesc": "Lose and you're out.",
       "uclDesc": "Everyone plays everyone, then the top finishers go into a bracket. The knockout rounds are two-legged, the final is a single game.",
       "legs": "Knockout legs",
+      "leagueLegs": "How often does each pair meet?",
+      "leagueSingleDesc": "Everyone plays everyone once.",
+      "leagueDoubleDesc": "Everyone plays everyone twice — the second half of the season is the first half reversed, so each team hosts every other one.",
       "note": "The fixtures are drawn at random. You enter the scores; the table and the bracket keep themselves up to date.",
       "legsSingleDesc": "One match decides the tie.",
       "legsDoubleDesc": "Home and away; the aggregate score decides. Level on aggregate goes to penalties.",
@@ -242,10 +249,10 @@
     "rollTeam": "Get random team",
     "yourTeam": "Your team",
     "rollFirst": "Roll a team first.",
-    "clubExhausted": "You already took {{max}} players from this club — change the team, it won't cost a right.",
-    "rerollPool": "Team changes left",
+    "clubExhausted": "You already took {{max}} players from this club — reroll, it won't cost a right.",
+    "rerollPool": "Rerolls left",
     "rerollsLeft": "{{left}} of {{total}}",
-    "anotherTeam": "Change team",
+    "anotherTeam": "Reroll",
     "freeReroll": "free",
     "rolling": "Rolling…",
     "clubLimitFull": "You have filled the player limit for {{club}} ({{max}}) — pick from another club.",
@@ -286,6 +293,8 @@
     "team": "Team",
     "tbd": "?",
     "bye": "Bye",
+    "allMatches": "All matches",
+    "penaltyWinner": "{{name}} won on penalties",
     "bracketHint": "Enter the scores; winners move up the bracket on their own.",
     "qualifyNote": "The top {{top}} go through to the knockout phase. {{remaining}} games left.",
     "leagueDone": "League phase over — the bracket is seeded by the table.",
@@ -319,6 +328,8 @@
   "champion": {
     "title": "Champion",
     "squads": "See the squads",
+    "summary": "Tournament summary",
+    "hideSummary": "Hide the summary",
     "again": "New draft"
   },
   "pitch": {
