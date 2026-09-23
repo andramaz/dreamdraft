@@ -53,6 +53,11 @@ Every push to `main` redeploys. Pull requests get their own preview URL.
 | `DIRECT_URL`   | local    | The same database, unpooled host. Prisma Migrate only.                  |
 | `CORS_ORIGINS` | no       | Only if the frontend is ever hosted somewhere else. Comma separated.    |
 
+In Vercel, `DATABASE_URL` is set on **Production only**. Preview deployments
+have none, which is fine while `main` is the only branch — nothing builds a
+preview. The day a branch or a pull request gets deployed, its API will fail
+on startup until the variable is added to Preview as well.
+
 ## The database
 
 Postgres on [Neon](https://neon.tech)'s free tier. Vercel has none of its own,
