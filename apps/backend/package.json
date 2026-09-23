@@ -25,7 +25,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:deploy": "prisma migrate deploy",
-    "seed": "npm run build && node prisma/seed.ts"
+    "seed": "npm run build && node prisma/seed.ts",
+    "check:shift": "npm run build && node prisma/check-shift.ts"
   },
   "dependencies": {
     "@dreamdraft/shared": "*",

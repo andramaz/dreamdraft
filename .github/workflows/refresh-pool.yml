@@ -1,20 +1,22 @@
-# Refresh the player pool from EA, but never without a person looking first.
+# Refresh the player pool from EA, weekly and unattended.
 #
-# EA's ratings endpoint takes no version parameter and, around a release, will
-# serve the previous game to a caller it does not recognise. Nothing in the
-# response says which year it is. A pool once went all the way into the
-# database wearing the wrong label, so this workflow splits in two: the scrape
-# runs unattended and prints what it found, and the load waits for a human to
-# read that and approve it.
+# EA's ratings endpoint takes no version parameter: it serves whichever game
+# is current. The day FC28 ships, this same url starts returning FC28, and a
+# refresh that trusted it would write a new game over FC27 under FC27's own
+# label — which is how FC26 once got into this database.
 #
-# Setup, once:
-#   - Settings > Secrets and variables > Actions: add DATABASE_URL (Neon's
-#     pooled connection string).
-#   - Settings > Environments: create `database` and add yourself under
-#     "Required reviewers". Without that the load job will not pause.
+# Asking a person to approve every run does not fix that. Weekly approvals for
+# a refresh that has never once been wrong teach you to click yes without
+# reading, and the one week it matters you click yes as well. So the run is
+# automatic and `check:shift` guards it instead: it compares the incoming pool
+# with what is stored and stops only when the difference is too large to be a
+# ratings update. A season's refresh sails through; a change of game does not.
 #
-# There is deliberately no `pull_request` trigger: secrets must not be within
-# reach of a workflow anybody can propose.
+# Setup, once: Settings > Secrets and variables > Actions, add DATABASE_URL
+# (Neon's pooled connection string). DIRECT_URL is optional.
+#
+# There is deliberately no `pull_request` trigger: on a public repository that
+# is what keeps the secret out of reach of a workflow anybody can propose.
 
 name: Refresh player pool
 
@@ -29,16 +31,22 @@ on:
         description: 'Game version to scrape'
         default: 'FC27'
         required: false
+      force:
+        description: 'Load even if the pool looks like a different game'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
-  scrape:
-    name: Scrape and report
+  refresh:
+    name: Scrape, check, load
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.pick.outputs.version }}
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
+      VERSION: ${{ inputs.version || 'FC27' }}
     steps:
       - uses: actions/checkout@v5
 
@@ -49,78 +57,39 @@ jobs:
 
       - name: Install
         run: npm ci
-
-      - id: pick
-        run: echo "version=${{ inputs.version || 'FC27' }}" >> "$GITHUB_OUTPUT"
 
       - name: Scrape EA
-        id: scrape
-        run: |
-          node scripts/scrape-ea.mjs --version "${{ steps.pick.outputs.version }}" | tee scrape.log
+        run: node scripts/scrape-ea.mjs --version "$VERSION" | tee scrape.log
 
       - name: Build the pool
+        run: node scripts/build-pool.mjs --version "$VERSION" | tee -a scrape.log
+
+      # The gate. Exits non-zero when the pool does not look like the same
+      # game, which fails the run before anything is written.
+      - name: Is this still the same game?
         run: |
-          node scripts/build-pool.mjs --version "${{ steps.pick.outputs.version }}" | tee -a scrape.log
-
-      # The report is the point of the whole job: it is what the reviewer reads
-      # before deciding, so it goes on the run's summary page rather than being
-      # buried in the log.
-      - name: Put the report on the summary
-        if: always()
-        run: |
-          {
-            echo "## ${{ steps.pick.outputs.version }} scrape"
-            echo
-            echo 'Read this before approving the load. Check a transfer or two'
-            echo 'against the game — nothing here proves which year it is.'
-            echo
-            echo '```'
-            sed -n '/--- what came back ---/,$p' scrape.log
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Keep the pool for the load job
-        uses: actions/upload-artifact@v4
-        with:
-          name: pool
-          path: data/
-          retention-days: 7
-
-  load:
-    name: Load into Postgres
-    needs: scrape
-    runs-on: ubuntu-latest
-    # The gate. A reviewer on this environment is what makes the run pause;
-    # with none configured it would sail straight through.
-    environment: database
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '24'
-          cache: npm
-
-      - name: Install
-        run: npm ci
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: pool
-          path: data/
+          npm run check:shift -w @dreamdraft/backend -- \
+            --version "$VERSION" ${{ inputs.force && '--force' || '' }} \
+            | tee -a scrape.log
 
       - name: Apply migrations
         working-directory: apps/backend
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
         run: npx prisma migrate deploy
 
-      # Upsert, not --fresh: a refresh updates ratings and clubs in place and
-      # keeps every row's id, which anything referring to a player depends on.
       - name: Seed
         working-directory: apps/backend
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
         run: npm run seed
+
+      # Whether it loaded or was turned away, the numbers go on the run's
+      # summary page — that is where you look when the weekly mail says the
+      # job failed.
+      - name: Report
+        if: always()
+        run: |
+          {
+            echo "## $VERSION"
+            echo
+            echo '```'
+            sed -n '/--- what came back ---/,$p' scrape.log || cat scrape.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

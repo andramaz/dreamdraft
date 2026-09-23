@@ -353,13 +353,16 @@ when draft/tournament logic is implemented.
   | `npm run pool`         | both of those    | `fc27-pool.json` — what the app loads      |
 
   Everything lands in a gitignored `data/`. A weekly GitHub Actions job
-  (`.github/workflows/refresh-pool.yml`) runs the first two steps unattended
-  and then **stops for a human**: the load into Postgres sits behind a
-  `database` environment with a required reviewer, and the run's summary page
-  carries the verification report to read first. It is not a Vercel cron,
-  which cannot run for the four minutes a scrape takes, and it has no
-  `pull_request` trigger, so `DATABASE_URL` is never within reach of a
-  workflow a stranger can propose.
+  (`.github/workflows/refresh-pool.yml`) runs the lot unattended, guarded by
+  `check:shift` rather than by a person: it compares the incoming pool with
+  what is stored and fails the run before anything is written when the pool
+  changes size by a tenth, gains a new best player, or moves a fifth of the
+  squad. A season's ratings update passes; the day the endpoint starts serving
+  the next game, it does not. Weekly approvals were considered and dropped —
+  approving a refresh that has never been wrong teaches you to approve the one
+  that is. It is not a Vercel cron, which cannot run for the four minutes a
+  scrape takes, and it has no `pull_request` trigger, so `DATABASE_URL` stays
+  out of reach of a workflow a stranger can propose.
 
 - **A player with no club is not in the pool.** FC27 has none — all 17,849 men
   come with a club, across 669 of them, 654 with eighteen players or more. The
