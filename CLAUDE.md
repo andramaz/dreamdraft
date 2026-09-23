@@ -330,6 +330,21 @@ when draft/tournament logic is implemented.
 
 ## Notes / open questions
 
+- **To do, raised 2026-09-24** (all step 8, the visual pass):
+  - **A goalkeeper's card is not an outfield card.** EA returns the keeper's
+    values in the same six fields everyone else uses: `pace`, `shooting`,
+    `passing`, `dribbling`, `defending` and `physical` carry DIV, HAN, KIC,
+    REF, SPD and POS. The card labels them as if they were an outfielder's, so
+    a keeper currently reads as having 90 pace and 52 defending when those are
+    his diving and his speed. The card needs to label — and probably order —
+    them by position.
+  - **A player with no portrait needs a user icon**, not a broken image. The
+    `photoUrl` is always filled in but EA has no head render below roughly 65:
+    a sample found none at all in the 47-64 band, which is about 7,000 of the
+    17,849. The image simply fails to load and what shows is the browser's
+    broken-image mark, which looks worse than an empty frame.
+  - **Filtering on the board** — wanted, not yet specified.
+
 - Deployment: **settled** — Vercel, one project, see `DEPLOY.md`. The two
   things it cannot do, for when they come up: a request may not run longer
   than 60s (so the scraper in step 7 belongs in a GitHub Actions cron job or a
