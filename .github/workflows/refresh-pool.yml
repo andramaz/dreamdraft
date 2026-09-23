@@ -1,0 +1,126 @@
+# Refresh the player pool from EA, but never without a person looking first.
+#
+# EA's ratings endpoint takes no version parameter and, around a release, will
+# serve the previous game to a caller it does not recognise. Nothing in the
+# response says which year it is. A pool once went all the way into the
+# database wearing the wrong label, so this workflow splits in two: the scrape
+# runs unattended and prints what it found, and the load waits for a human to
+# read that and approve it.
+#
+# Setup, once:
+#   - Settings > Secrets and variables > Actions: add DATABASE_URL (Neon's
+#     pooled connection string).
+#   - Settings > Environments: create `database` and add yourself under
+#     "Required reviewers". Without that the load job will not pause.
+#
+# There is deliberately no `pull_request` trigger: secrets must not be within
+# reach of a workflow anybody can propose.
+
+name: Refresh player pool
+
+on:
+  schedule:
+    # Mondays, 04:00 UTC. EA refreshes base ratings a handful of times a
+    # season, so weekly is generous.
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Game version to scrape'
+        default: 'FC27'
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  scrape:
+    name: Scrape and report
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.pick.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - id: pick
+        run: echo "version=${{ inputs.version || 'FC27' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Scrape EA
+        id: scrape
+        run: |
+          node scripts/scrape-ea.mjs --version "${{ steps.pick.outputs.version }}" | tee scrape.log
+
+      - name: Build the pool
+        run: |
+          node scripts/build-pool.mjs --version "${{ steps.pick.outputs.version }}" | tee -a scrape.log
+
+      # The report is the point of the whole job: it is what the reviewer reads
+      # before deciding, so it goes on the run's summary page rather than being
+      # buried in the log.
+      - name: Put the report on the summary
+        if: always()
+        run: |
+          {
+            echo "## ${{ steps.pick.outputs.version }} scrape"
+            echo
+            echo 'Read this before approving the load. Check a transfer or two'
+            echo 'against the game — nothing here proves which year it is.'
+            echo
+            echo '```'
+            sed -n '/--- what came back ---/,$p' scrape.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the pool for the load job
+        uses: actions/upload-artifact@v4
+        with:
+          name: pool
+          path: data/
+          retention-days: 7
+
+  load:
+    name: Load into Postgres
+    needs: scrape
+    runs-on: ubuntu-latest
+    # The gate. A reviewer on this environment is what makes the run pause;
+    # with none configured it would sail straight through.
+    environment: database
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: pool
+          path: data/
+
+      - name: Apply migrations
+        working-directory: apps/backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
+        run: npx prisma migrate deploy
+
+      # Upsert, not --fresh: a refresh updates ratings and clubs in place and
+      # keeps every row's id, which anything referring to a player depends on.
+      - name: Seed
+        working-directory: apps/backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
+        run: npm run seed

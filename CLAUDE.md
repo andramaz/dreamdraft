@@ -352,11 +352,14 @@ when draft/tournament logic is implemented.
   | `npm run scrape:clubs` | Futwiz career DB | `club-backfill-fc27.json`                  |
   | `npm run pool`         | both of those    | `fc27-pool.json` — what the app loads      |
 
-  Everything lands in a gitignored `data/`. Nothing is scheduled yet: a cron
-  would write files nothing reads, since the API still serves the static fake
-  pool. Once Prisma is wired (step 5) the scrape becomes a weekly GitHub
-  Actions job writing into Postgres — not a Vercel cron, which cannot run for
-  the four minutes it takes.
+  Everything lands in a gitignored `data/`. A weekly GitHub Actions job
+  (`.github/workflows/refresh-pool.yml`) runs the first two steps unattended
+  and then **stops for a human**: the load into Postgres sits behind a
+  `database` environment with a required reviewer, and the run's summary page
+  carries the verification report to read first. It is not a Vercel cron,
+  which cannot run for the four minutes a scrape takes, and it has no
+  `pull_request` trigger, so `DATABASE_URL` is never within reach of a
+  workflow a stranger can propose.
 
 - **A player with no club is not in the pool.** FC27 has none — all 17,849 men
   come with a club, across 669 of them, 654 with eighteen players or more. The
