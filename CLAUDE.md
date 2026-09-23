@@ -21,8 +21,12 @@ scale, deployed to a server for fun and to practice deployment.
   Backend responses should stay language-agnostic (IDs/keys), translation
   happens frontend-side. Domain data like position abbreviations (ST, CB, etc.)
   needs its own translated label mapping.
-- **Deployment target:** TBD — likely Railway/Render (backend + DB) and
-  Vercel/Netlify (frontend). Not decided yet, revisit when we get there.
+- **Deployment:** **settled 2026-09-23** — one Vercel project on the free
+  Hobby plan serves both halves: the frontend as static files, the Nest app as
+  a single serverless function under `/api`. Railway was the other candidate
+  and was dropped because it costs $5/month and this app does not need a
+  long-running process — there is no server-side state, the draft engine runs
+  in the browser. See `DEPLOY.md`.
 
 ## Visual direction
 
@@ -284,7 +288,12 @@ when draft/tournament logic is implemented.
 
 ## Notes / open questions
 
-- Deployment provider not finalized.
+- Deployment: **settled** — Vercel, one project, see `DEPLOY.md`. The two
+  things it cannot do, for when they come up: a request may not run longer
+  than 60s (so the scraper in step 7 belongs in a GitHub Actions cron job or a
+  local seed run, not in an endpoint), and there are no WebSockets (so a live
+  shared draft room would mean moving the backend somewhere long-running —
+  the Nest code itself would not change).
 - Exact scraping source (Sofifa vs Futwiz-style endpoints vs Kaggle dataset)
   not finalized — decide once schema is stable.
 - UCL format: **settled** — round robin, then a bracket for the top finishers
