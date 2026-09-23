@@ -12,8 +12,9 @@ scale, deployed to a server for fun and to practice deployment.
 
 - **Backend:** NestJS (TypeScript)
 - **ORM:** Prisma
-- **Database:** PostgreSQL (self-hosted instance already used for another project —
-  this app gets its own database on the same instance)
+- **Database:** PostgreSQL on **Neon**, free tier (settled 2026-09-23). The
+  "reuse the existing self-hosted instance" plan was dropped: there is no
+  working PostgreSQL on the machine — the install at `C:\Program Files  PostgreSQL` has an empty, uninitialised data directory — and no VPS.
 - **Frontend:** React (via Vite)
 - **i18n:** `react-i18next` — site must support **both Turkish and English**,
   user-switchable. Set this up from the start of scaffolding, not retrofitted
@@ -88,6 +89,10 @@ scale, deployed to a server for fun and to practice deployment.
    i18n scaffolding at this stage too.
 4. Add draft logic (draft config flow below, random selection, team building).
 5. Wire Prisma/PostgreSQL in for real — replace fake JSON with DB reads/writes.
+   **Done 2026-09-23**: Postgres on Neon's free tier, `PrismaModule` global in
+   the Nest graph, `PlayersService` reading from it, and `npm run seed` loading
+   `data/fc27-pool.json`. The self-hosted instance this file assumed does not
+   exist — there is no working PostgreSQL on the machine and no VPS.
 6. Deploy early (even with fake data) to de-risk deployment separately from
    scraping work.
 7. **Scraping/data-fetching comes last** — build the scraper once the target
@@ -311,8 +316,8 @@ when draft/tournament logic is implemented.
   useful reference points when explaining NestJS/Prisma patterns.
 - Comfortable with HTML/CSS/JS/Node/PHP fundamentals; still learning
   NestJS/Prisma specifics (has used NestJS before but not deeply familiar).
-- Already runs a PostgreSQL instance for another project — reuse it, just add
-  a new database for this project.
+- Believed they had a PostgreSQL instance running for another project; they do
+  not, so this app uses Neon (see Stack).
 
 ## Notes / open questions
 

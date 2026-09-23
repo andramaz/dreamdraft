@@ -1,6 +1,5 @@
-// Prisma schema — starting point, expect to evolve.
-// Not wired into the app yet (build order step 5); the API still serves
-// static data from src/players/data/players.data.ts.
+// The player pool, loaded by scripts/ from EA's ratings API (see CLAUDE.md).
+// Nothing in here is authored by hand: a seed run is the only writer.
 
 generator client {
   provider     = "prisma-client"
@@ -8,28 +7,53 @@ generator client {
   moduleFormat = "esm"
 }
 
+// Prisma 7 keeps connection urls out of the schema: they live in
+// prisma.config.ts for the CLI, and the client is handed an adapter.
 datasource db {
   provider = "postgresql"
 }
 
 model Player {
-  id          Int      @id @default(autoincrement())
-  name        String
-  /// Canonical key (GK, CB, ST...) — translated on the frontend.
-  position    String
-  rating      Int
-  club        String
+  id Int @id @default(autoincrement())
+
+  /// EA's own player id, stable across scrapes — Salah is always 209331.
+  /// Not the primary key: the same player appears once per game version.
+  eaId        Int
   /// FC26, FC27... — decides which player pool a draft uses.
   gameVersion String
-  pace        Int?
-  shooting    Int?
-  passing     Int?
-  dribbling   Int?
-  defending   Int?
-  physical    Int?
-  photoUrl    String?
-  createdAt   DateTime @default(now())
 
+  name String
+  /// Canonical key (GK, CB, ST...) — translated on the frontend.
+  position String
+  rating   Int
+
+  /// Display name. A club is identified by `clubId` where there is one:
+  /// two different clubs share a name in EA's own data (Nacional is both
+  /// Uruguay's and Portugal's, Racing Club both Argentina's and Montevideo's).
+  club String
+  /// EA's club id. Null when the club came from the Futwiz backfill, which
+  /// has no EA id to give.
+  clubId Int?
+  /// Which source named the club: null for EA, "futwiz" for the backfill.
+  clubSource String?
+
+  /// For a goalkeeper these six carry the keeper card instead:
+  /// pace/shooting/passing/dribbling/defending/physical read as
+  /// DIV/HAN/KIC/REF/SPD/POS, which is what EA itself returns.
+  pace      Int?
+  shooting  Int?
+  passing   Int?
+  dribbling Int?
+  defending Int?
+  physical  Int?
+
+  photoUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// What a re-scrape upserts on.
+  @@unique([eaId, gameVersion])
   @@index([gameVersion, position])
   @@index([gameVersion, club])
+  @@index([gameVersion, rating])
 }

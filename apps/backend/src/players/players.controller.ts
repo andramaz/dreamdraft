@@ -24,7 +24,7 @@ export class PlayersController {
     @Query('gameVersion') gameVersion?: string,
     @Query('position') position?: string,
     @Query('club') club?: string,
-  ): Player[] {
+  ): Promise<Player[]> {
     if (
       gameVersion !== undefined &&
       !(GAME_VERSIONS as readonly string[]).includes(gameVersion)
@@ -43,7 +43,7 @@ export class PlayersController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Player {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Player> {
     return this.playersService.findOne(id);
   }
 }

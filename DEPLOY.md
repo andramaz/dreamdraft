@@ -45,27 +45,46 @@ instance goes on to serve.
 
 Every push to `main` redeploys. Pull requests get their own preview URL.
 
-## Optional environment variables
+## Environment variables
 
-| Variable       | When it is needed                                                             |
-| -------------- | ----------------------------------------------------------------------------- |
-| `CORS_ORIGINS` | Only if the frontend is ever hosted somewhere else. Comma separated.          |
-| `DATABASE_URL` | Build-order step 5, once Prisma reads from Postgres instead of the fake data. |
+| Variable       | Required | What it is                                                              |
+| -------------- | -------- | ----------------------------------------------------------------------- |
+| `DATABASE_URL` | yes      | Neon's **pooled** connection string. The app will not start without it. |
+| `DIRECT_URL`   | local    | The same database, unpooled host. Prisma Migrate only.                  |
+| `CORS_ORIGINS` | no       | Only if the frontend is ever hosted somewhere else. Comma separated.    |
 
-## Adding the database (build-order step 5)
+## The database
 
-Vercel has no database of its own. Use a provider with a free tier —
-[Neon](https://neon.tech) fits best here, because it gives a pooled connection
-string, and a serverless function opening a fresh Postgres connection per cold
-start is exactly what exhausts a small instance.
+Postgres on [Neon](https://neon.tech)'s free tier. Vercel has none of its own,
+and Neon hands out a pooled connection string, which is what a serverless
+function needs: a fresh Postgres connection per cold start is exactly what
+exhausts a small instance.
 
-1. Create the project and copy the **pooled** connection string.
-2. Add it as `DATABASE_URL` in Vercel → Settings → Environment Variables.
-3. `npx prisma migrate deploy` against it once, from a machine that has the
-   URL in a local `.env`.
+Two urls, differing only by `-pooler` in the host. Migrations need the direct
+one, because a pooler cannot hold the advisory lock DDL takes. Prisma 7 keeps
+neither in the schema — the CLI reads them from `apps/backend/prisma.config.ts`
+and the client is handed an adapter, see `src/prisma/prisma.service.ts`.
 
-`prisma generate` already runs in the backend's `prebuild`, and it needs no
-`DATABASE_URL` — the schema declares the provider only.
+**`DATABASE_URL` has to be set in Vercel before this is deployed.** The app
+throws on startup without it, deliberately: an empty player pool looks like a
+broken draft rather than a missing setting.
+
+Working on it locally — `apps/backend/.env` holds both urls and is gitignored:
+
+```sh
+npm run prisma:migrate -w @dreamdraft/backend   # create a migration
+npm run prisma:deploy  -w @dreamdraft/backend   # apply existing ones
+npm run seed           -w @dreamdraft/backend   # load data/fc27-pool.json
+```
+
+The seed builds first, because Prisma 7 generates a TypeScript client and the
+script imports the compiled one. It upserts on `(eaId, gameVersion)`, so a
+re-run after a fresh scrape updates ratings and clubs in place rather than
+duplicating anybody. `--fake` loads the small hand-written pool instead, for a
+database that just needs filling.
+
+`prisma generate` runs in the backend's `prebuild` and needs no connection, so
+a Vercel build never touches the database.
 
 ## What this hosting cannot do
 
