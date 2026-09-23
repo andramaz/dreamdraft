@@ -1,6 +1,6 @@
 // Turn the scraped files into the pool the app will actually load.
 //
-//   node scripts/build-pool.mjs
+//   node scripts/build-pool.mjs [--version fc27]
 //
 // Third and last step of the pipeline:
 //
@@ -18,7 +18,10 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = join(ROOT, 'data');
-const VERSION = 'fc27';
+const versionArg = process.argv.indexOf('--version');
+const VERSION = (
+  versionArg > 0 ? process.argv[versionArg + 1] : 'fc27'
+).toLowerCase();
 
 /**
  * A backfilled club needs enough players to be worth rolling in Random Teams.

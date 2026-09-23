@@ -49,20 +49,29 @@ scale, deployed to a server for fun and to practice deployment.
   API**, the one the ratings site itself calls — verified in DevTools:
 
   ```
-  GET https://drop-api.ea.com/rating/ea-sports-fc?locale=en&limit=100&offset=0
+  GET https://drop-api.ea.com/rating/ea-sports-fc?locale=en&gender=0&limit=100&offset=0
+  drop-referrer: https://www.ea.com/games/ea-sports-fc/ratings
   ```
 
-  No authentication, no cookies, no headers (the site sends an `x-feature`
-  header; it changes nothing). `limit` caps at 100 and 200 returns a 400, so a
-  full dump is ~179 paged requests. 17,873 players: 16,228 men plus 1,645
-  women, selectable with `gender=0` / `gender=1`; `position`, `team` and
-  `search` filter too, and an unknown parameter is ignored silently. There is
-  **no version parameter** — the endpoint serves whatever game is current, so
-  it cannot reach back to FC26.
-  - **FC26 and older come from Sofifa**, which keeps every edition. Written as
-    a second adapter normalising to the same `Player` shape. Deliberately
-    **after** FC27 works end to end: the target shape has to be settled by real
-    data first.
+  No account, no cookies. The `drop-referrer` header is not optional and there
+  is **no version parameter**: the endpoint serves whichever game is current,
+  and around a release it hands a caller that does not look like the site the
+  _previous_ one instead. That is how 16,228 FC26 players were once scraped,
+  labelled FC27 and loaded into the database before anyone looked at them
+  (2026-09-23). `scrape-ea.mjs` now ends with a report of the top players and
+  three well-known squads, and **nothing is loaded until a person who plays
+  the game has read it**. No automated check can tell one year from another;
+  Salah at Liverpool rather than Trabzonspor is obvious to a human in seconds.
+  - `limit` caps at 100 and 200 returns a 400, so a full pull is ~179 paged
+    requests. FC27: 19,789 players, 17,849 of them men, selectable with
+    `gender=0` / `gender=1`; `position`, `team` and `search` filter too, and an
+    unknown parameter is ignored silently.
+  - **FC26 and older cannot be re-fetched** — the endpoint has moved on. The
+    FC26 pull is kept in `data/ea-fc26-*.json` as the only copy there is. It is
+    an early-cycle snapshot, not FC26's final ratings; fifacm.com keeps dated
+    snapshots (the last is 7 July 2026) keyed by EA's own player ids, and
+    Futwiz's `/fc26/career-mode/players` holds the final state, if the latest
+    FC26 is ever wanted.
   - Rejected: the FUT Web App API (`utas…ea.com`). It needs a real EA account,
     the session tokens are short-lived so it cannot run unattended, and the
     scraping traffic risks a ban on the account.
@@ -349,25 +358,14 @@ when draft/tournament logic is implemented.
   Actions job writing into Postgres — not a Vercel cron, which cannot run for
   the four minutes it takes.
 
-- **A player with no club is not in the pool** (settled 2026-09-23). EA leaves
-  1,515 without one and Futwiz supplies what it can; whoever is still without
-  a club is left out.
-  - Futwiz is the right source because it is the _same snapshot_: its
-    Eredivisie holds Volendam, Heracles and NAC Breda, as FC27 does. Wikipedia
-    and football-data.org were both tried and both describe today's squads, so
-    each placed only about half and missed the same well-known names.
-  - Two kinds of gap, and they need different lookups. A club EA has no licence
-    for — Amed, Çorum and Erzurumspor in the Süper Lig, the whole Eredivisie —
-    is filled by **walking that league's club pages**. A player EA has simply
-    lost track of after a transfer is not in any of those pages at all: he is
-    at a club in another league, and only a **name search** finds him. Quinten
-    Timber reads as Eredivisie with no club on EA's site and is at Crystal
-    Palace in FC27.
-  - The rule repairs itself: when EA's next refresh assigns the new club, the
-    player returns to the pool on the following scrape. No mapping to keep.
-  - A backfilled club needs **8 players** to be kept (`MIN_BACKFILLED_SQUAD`).
-    Futwiz placed a handful of South Americans in clubs EA already had whole,
-    which would have left one-player clubs for Random Teams to roll.
+- **A player with no club is not in the pool.** FC27 has none — all 17,849 men
+  come with a club, across 669 of them, 654 with eighteen players or more. The
+  1,515 without one that cost a day's work were an artefact of the stale FC26
+  pull, not of EA's data, and the club backfill written for them
+  (`backfill-futwiz.mjs`, walking Futwiz's career-mode club pages) is kept for
+  whenever FC26 is revisited. `build-pool.mjs` applies it when the file is
+  there and drops whoever is still clubless, which also repairs itself: EA
+  assigns a club at its next refresh and the player returns on the next scrape.
 - The **`Player` primary key** is the autoincrement id, with
   `@@unique([eaId, gameVersion])` beside it (settled 2026-09-23). EA's id alone
   cannot be the key: the same player appears once per game version, so Salah is

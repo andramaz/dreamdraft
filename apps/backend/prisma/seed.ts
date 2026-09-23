@@ -74,6 +74,13 @@ const { players, source } = load();
 
 console.log(`seeding ${players.length} players from ${source}`);
 
+// --fresh is for a pool that was wrong rather than stale: an upsert would
+// leave behind rows whose players are not in the new data at all.
+if (process.argv.includes('--fresh')) {
+  const removed = await prisma.player.deleteMany({});
+  console.log(`--fresh: removed ${removed.count} existing rows`);
+}
+
 const COLUMNS = [
   'eaId',
   'gameVersion',
