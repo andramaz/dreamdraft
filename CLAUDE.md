@@ -44,9 +44,37 @@ scale, deployed to a server for fun and to practice deployment.
 - This is a legal gray area (EA's data/assets, not licensed) but low-risk given
   the small, non-commercial scale. Rate-limit requests, respect robots.txt where
   possible, and cache scraped data instead of live-fetching on every request.
-- Candidate data sources discussed: Sofifa.com, Kaggle FIFA datasets (for early
-  testing without live scraping), Futwiz/Fifaindex-style API endpoints.
+- Sources: **settled 2026-09-23**. **FC27 comes from EA's own public ratings
+  API**, the one the ratings site itself calls — verified in DevTools:
+
+  ```
+  GET https://drop-api.ea.com/rating/ea-sports-fc?locale=en&limit=100&offset=0
+  ```
+
+  No authentication, no cookies, no headers (the site sends an `x-feature`
+  header; it changes nothing). `limit` caps at 100 and 200 returns a 400, so a
+  full dump is ~179 paged requests. 17,873 players: 16,228 men plus 1,645
+  women, selectable with `gender=0` / `gender=1`; `position`, `team` and
+  `search` filter too, and an unknown parameter is ignored silently. There is
+  **no version parameter** — the endpoint serves whatever game is current, so
+  it cannot reach back to FC26.
+  - **FC26 and older come from Sofifa**, which keeps every edition. Written as
+    a second adapter normalising to the same `Player` shape. Deliberately
+    **after** FC27 works end to end: the target shape has to be settled by real
+    data first.
+  - Rejected: the FUT Web App API (`utas…ea.com`). It needs a real EA account,
+    the session tokens are short-lived so it cannot run unattended, and the
+    scraping traffic risks a ban on the account.
+
+- The EA response carries much more than the current schema uses, and it is all
+  free once the request is made — worth revisiting when the cards get richer
+  (build-order step 8): 40 detailed attributes on top of the six summary ones,
+  `alternatePositions` (secondary positions), `playerAbilities` (PlayStyles,
+  with descriptions), nationality plus flag image, club crest image, height,
+  weight, preferred foot, skill moves, weak foot, and a `diff` on every stat
+  showing the change since the last ratings update.
 - Photos should be cached (own storage/S3-like) rather than hotlinked long-term.
+  EA serves them as transparent PNG head renders on `avatarUrl`.
 
 ## Build order (agreed approach — follow this sequence)
 
@@ -294,8 +322,57 @@ when draft/tournament logic is implemented.
   local seed run, not in an endpoint), and there are no WebSockets (so a live
   shared draft room would mean moving the backend somewhere long-running —
   the Nest code itself would not change).
-- Exact scraping source (Sofifa vs Futwiz-style endpoints vs Kaggle dataset)
-  not finalized — decide once schema is stable.
+- Scraping source: **settled** — EA's public ratings API for FC27, Sofifa for
+  FC26, see the data sourcing section above. `scripts/scrape-ea.mjs` pulls the
+  pool (`npm run scrape:ea`); output lands in a gitignored `data/`.
+- A club is identified by **`clubId`, not its name** (settled 2026-09-23). Two
+  names in the men's pool are shared by two real clubs each — Nacional is both
+  Uruguay's and Portugal's, Racing Club both Argentina's and Montevideo's —
+  and keying by name would hand a draft one squad made of two. The crest image
+  is keyed by the id as well.
+- **The pipeline is three scripts**, run in order (settled 2026-09-23):
+
+  | Command                | Source           | Output                                     |
+  | ---------------------- | ---------------- | ------------------------------------------ |
+  | `npm run scrape:ea`    | EA ratings API   | `ea-fc27-raw.json`, `ea-fc27-players.json` |
+  | `npm run scrape:clubs` | Futwiz career DB | `club-backfill-fc27.json`                  |
+  | `npm run pool`         | both of those    | `fc27-pool.json` — what the app loads      |
+
+  Everything lands in a gitignored `data/`. Nothing is scheduled yet: a cron
+  would write files nothing reads, since the API still serves the static fake
+  pool. Once Prisma is wired (step 5) the scrape becomes a weekly GitHub
+  Actions job writing into Postgres — not a Vercel cron, which cannot run for
+  the four minutes it takes.
+
+- **A player with no club is not in the pool** (settled 2026-09-23). EA leaves
+  1,515 without one and Futwiz supplies what it can; whoever is still without
+  a club is left out.
+  - Futwiz is the right source because it is the _same snapshot_: its
+    Eredivisie holds Volendam, Heracles and NAC Breda, as FC27 does. Wikipedia
+    and football-data.org were both tried and both describe today's squads, so
+    each placed only about half and missed the same well-known names.
+  - Two kinds of gap, and they need different lookups. A club EA has no licence
+    for — Amed, Çorum and Erzurumspor in the Süper Lig, the whole Eredivisie —
+    is filled by **walking that league's club pages**. A player EA has simply
+    lost track of after a transfer is not in any of those pages at all: he is
+    at a club in another league, and only a **name search** finds him. Quinten
+    Timber reads as Eredivisie with no club on EA's site and is at Crystal
+    Palace in FC27.
+  - The rule repairs itself: when EA's next refresh assigns the new club, the
+    player returns to the pool on the following scrape. No mapping to keep.
+  - A backfilled club needs **8 players** to be kept (`MIN_BACKFILLED_SQUAD`).
+    Futwiz placed a handful of South Americans in clubs EA already had whole,
+    which would have left one-player clubs for Random Teams to roll.
+- The **`Player` primary key** is the autoincrement id, with
+  `@@unique([eaId, gameVersion])` beside it (settled 2026-09-23). EA's id alone
+  cannot be the key: the same player appears once per game version, so Salah is
+  209331 in both FC26 and FC27. The pair is what a re-scrape upserts on.
+- EA's ratings API carries the **base ratings only** — the ones Career Mode
+  uses. No promo, TOTW or special-card versions; those are a separate endpoint
+  (`drop-api.ea.com/team-of-the-week/ea-sports-fc/active-weekly-event`). Every
+  stat carries a `diff` showing its change at EA's last ratings refresh, which
+  is how a re-scrape can tell who moved. All 16,228 read zero right now, so no
+  refresh has landed on FC27 yet.
 - UCL format: **settled** — round robin, then a bracket for the top finishers
   (see step 2).
 - Fixture order: **settled** — always a random draw, no seeding (see step 2).

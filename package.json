@@ -15,7 +15,10 @@
     "build": "npm run build -w @dreamdraft/shared && npm run build -w @dreamdraft/backend && npm run build -w @dreamdraft/frontend",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "scrape:ea": "node scripts/scrape-ea.mjs",
+    "scrape:clubs": "node scripts/backfill-futwiz.mjs",
+    "pool": "node scripts/build-pool.mjs"
   },
   "devDependencies": {
     "concurrently": "^10.0.5",

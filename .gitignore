@@ -24,6 +24,9 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# scraped data — rebuilt with `npm run scrape:ea`, too big for git
+data/
+
 # prisma generated client
 apps/backend/src/generated/
 
