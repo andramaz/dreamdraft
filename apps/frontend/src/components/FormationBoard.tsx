@@ -202,6 +202,14 @@ function SquadRow({
       <span lang="en" className="flex-1 truncate text-left text-silver">
         {player.name}
       </span>
+      {/* The club, dimmed: a picker planning the rest of the draft needs to
+          see how much of one club they have already used up. */}
+      <span
+        lang="en"
+        className="hidden max-w-28 shrink-0 truncate text-xs text-silver/60 sm:block"
+      >
+        {player.club}
+      </span>
       {placed ? (
         <span className="shrink-0 text-[0.65rem] tracking-wide text-star/80 uppercase">
           {t('pitch.onPitch')}
