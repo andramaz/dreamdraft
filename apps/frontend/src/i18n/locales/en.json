@@ -64,7 +64,13 @@
       "passing": "PAS",
       "dribbling": "DRI",
       "defending": "DEF",
-      "physical": "PHY"
+      "physical": "PHY",
+      "diving": "DIV",
+      "handling": "HAN",
+      "kicking": "KIC",
+      "reflexes": "REF",
+      "speed": "SPD",
+      "positioning": "POS"
     },
     "long": {
       "pace": "Pace",
@@ -72,7 +78,13 @@
       "passing": "Passing",
       "dribbling": "Dribbling",
       "defending": "Defending",
-      "physical": "Physical"
+      "physical": "Physical",
+      "diving": "Diving",
+      "handling": "Handling",
+      "kicking": "Kicking",
+      "reflexes": "Reflexes",
+      "speed": "Speed",
+      "positioning": "Positioning"
     }
   },
   "draft": {

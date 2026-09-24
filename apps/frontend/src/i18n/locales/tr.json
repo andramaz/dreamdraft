@@ -64,7 +64,13 @@
       "passing": "PAS",
       "dribbling": "DRİ",
       "defending": "DEF",
-      "physical": "FİZ"
+      "physical": "FİZ",
+      "diving": "ATL",
+      "handling": "KON",
+      "kicking": "VUR",
+      "reflexes": "REF",
+      "speed": "HIZ",
+      "positioning": "POZ"
     },
     "long": {
       "pace": "Hız",
@@ -72,7 +78,13 @@
       "passing": "Pas",
       "dribbling": "Dripling",
       "defending": "Defans",
-      "physical": "Fizik"
+      "physical": "Fizik",
+      "diving": "Atlama",
+      "handling": "Kontrol",
+      "kicking": "Vuruş",
+      "reflexes": "Refleks",
+      "speed": "Hız",
+      "positioning": "Pozisyon alma"
     }
   },
   "draft": {

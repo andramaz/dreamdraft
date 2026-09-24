@@ -331,13 +331,15 @@ when draft/tournament logic is implemented.
 ## Notes / open questions
 
 - **To do, raised 2026-09-24** (all step 8, the visual pass):
-  - **A goalkeeper's card is not an outfield card.** EA returns the keeper's
-    values in the same six fields everyone else uses: `pace`, `shooting`,
-    `passing`, `dribbling`, `defending` and `physical` carry DIV, HAN, KIC,
-    REF, SPD and POS. The card labels them as if they were an outfielder's, so
-    a keeper currently reads as having 90 pace and 52 defending when those are
-    his diving and his speed. The card needs to label — and probably order —
-    them by position.
+  - ~~A goalkeeper's card is not an outfield card.~~ **Done 2026-09-24.** EA
+    returns a keeper's values in the same six fields everyone else uses, but
+    they hold the keeper card: `pace` is his diving, `defending` his speed.
+    The order EA sends them in is already the order the game prints, so only
+    the names were wrong. `statLabel(position, key)` in `packages/shared` maps
+    the field to the label it should wear and `PlayerCard` looks it up; the
+    six keeper labels are in both locales (TR: ATL KON VUR REF HIZ POZ, as on
+    the real card). Verified against Ederson, whose card reads 80/81/90/81/64/83
+    in the game and whose row in our pool holds exactly those, in that order.
   - **A player with no portrait needs a user icon**, not a broken image. The
     `photoUrl` is always filled in but EA has no head render below roughly 65:
     a sample found none at all in the 47-64 band, which is about 7,000 of the

@@ -1,4 +1,4 @@
-import { STAT_KEYS, type Player } from '@dreamdraft/shared';
+import { STAT_KEYS, statLabel, type Player } from '@dreamdraft/shared';
 import { useTranslation } from 'react-i18next';
 
 interface PlayerCardProps {
@@ -78,20 +78,26 @@ export function PlayerCard({
       </p>
 
       <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 border-t border-gold/20 pt-3 text-sm">
-        {STAT_KEYS.map((key) => (
-          <div
-            key={key}
-            className="flex items-baseline justify-between"
-            title={t(`stats.long.${key}`)}
-          >
-            <dt className="text-xs font-semibold text-silver/70">
-              {t(`stats.short.${key}`)}
-            </dt>
-            <dd className="font-display font-bold text-white">
-              {player[key] ?? '–'}
-            </dd>
-          </div>
-        ))}
+        {STAT_KEYS.map((key) => {
+          // A keeper's six are the keeper card — diving, handling, kicking,
+          // reflexes, speed, positioning — sitting in the outfield fields EA
+          // returns them in. Same values, same order, different names.
+          const label = statLabel(player.position, key);
+          return (
+            <div
+              key={key}
+              className="flex items-baseline justify-between"
+              title={t(`stats.long.${label}`)}
+            >
+              <dt className="text-xs font-semibold text-silver/70">
+                {t(`stats.short.${label}`)}
+              </dt>
+              <dd className="font-display font-bold text-white">
+                {player[key] ?? '–'}
+              </dd>
+            </div>
+          );
+        })}
       </dl>
     </Tag>
   );
