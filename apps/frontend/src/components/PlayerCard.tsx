@@ -1,5 +1,12 @@
 import { STAT_KEYS, statLabel, type Player } from '@dreamdraft/shared';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+/**
+ * The portrait box. The photo and the stand-in for a missing one are the same
+ * size because they are the same hole in the card — change it here only.
+ */
+const PHOTO_SIZE = 'size-24';
 
 interface PlayerCardProps {
   player: Player;
@@ -54,16 +61,7 @@ export function PlayerCard({
           </span>
         </div>
 
-        {player.photoUrl ? (
-          <img
-            src={player.photoUrl}
-            alt=""
-            loading="lazy"
-            className="size-24 object-contain drop-shadow-[0_6px_12px_rgba(0,0,0,0.6)]"
-          />
-        ) : (
-          <SilhouettePlaceholder />
-        )}
+        <PlayerPhoto player={player} />
       </header>
 
       {/* lang="en": player names are proper nouns — avoid Turkish i→İ uppercasing */}
@@ -103,16 +101,49 @@ export function PlayerCard({
   );
 }
 
+/**
+ * EA fills `photoUrl` in for everyone but has no head render below roughly 65,
+ * which is some 7,000 of the pool. The request simply 404s, so the load failing
+ * is the only sign there is no portrait — hence the fallback on `onError`
+ * rather than on a null url. The failed url is what is remembered, so a card
+ * reused for another player tries that player's photo again.
+ */
+function PlayerPhoto({ player }: { player: Player }) {
+  const [broken, setBroken] = useState<string | null>(null);
+  const url = player.photoUrl;
+
+  if (!url || broken === url) return <SilhouettePlaceholder />;
+
+  return (
+    <img
+      src={url}
+      alt=""
+      loading="lazy"
+      onError={() => setBroken(url)}
+      className={`${PHOTO_SIZE} object-contain drop-shadow-[0_6px_12px_rgba(0,0,0,0.6)]`}
+    />
+  );
+}
+
+/**
+ * Stands in for a missing portrait: the card's own gold on a well of its own
+ * night blue, so an empty frame reads as part of the card rather than as
+ * something that failed to load.
+ */
 function SilhouettePlaceholder() {
   return (
-    <svg
-      viewBox="0 0 64 64"
+    <span
       aria-hidden="true"
-      className="size-24 text-gold/25"
+      className={`${PHOTO_SIZE} flex items-center justify-center rounded-full bg-night-950/35 ring-1 ring-gold/25 ring-inset`}
     >
-      <circle cx="32" cy="22" r="12" fill="currentColor" />
-      <path d="M8 62c0-14 10.7-24 24-24s24 10 24 24z" fill="currentColor" />
-    </svg>
+      <svg viewBox="0 0 64 64" className="h-3/5 w-3/5 text-gold/60">
+        <circle cx="32" cy="23" r="11" fill="currentColor" />
+        <path
+          d="M10 58c0-11.6 9.8-20 22-20s22 8.4 22 20z"
+          fill="currentColor"
+        />
+      </svg>
+    </span>
   );
 }
 
